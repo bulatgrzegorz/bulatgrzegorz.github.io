@@ -7,7 +7,7 @@ description: Some description.
 permalink: /about/
 ---
 
-<img class="img-rounded" src="/assets/img/uploads/profile.jpg" alt="Grzegorz Bułat" width="200">
+<img class="" src="/assets/img/uploads/profile.jpg" alt="Grzegorz Bułat" width="400">
 
 # About
 

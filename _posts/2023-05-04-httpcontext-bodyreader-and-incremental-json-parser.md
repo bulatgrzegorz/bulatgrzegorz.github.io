@@ -237,7 +237,6 @@ static bool TryParseFromJson(ref ReadOnlySequence<byte> buffer, ref JsonReaderSt
             continue;
         }
 
-        //Not enough data to read our token value 
         if(!utf8JsonReader.Read())
         {
             if(previousTokenSequencePosition is not null)
@@ -269,3 +268,9 @@ static bool TryParseFromJson(ref ReadOnlySequence<byte> buffer, ref JsonReaderSt
     return false;
 }
 ```
+
+And that's it. We are parsing json incrementally with low-allocation method! 🔥
+
+---
+
+Nevertheless I highly encourage to test above code - and always benchmark your solutions. Sometimes, simpler code is just good enough 😀 
