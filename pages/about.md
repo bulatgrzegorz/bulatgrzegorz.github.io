@@ -1,19 +1,17 @@
 ---
 layout: page
 menu: false
-date: '2020-02-27 01:53:59'
+date: '2022-05-05 20:01:59'
 title: About
 description: Some description.
 permalink: /about/
 ---
 
-<img class="img-rounded" src="/assets/img/uploads/profile.png" alt="Thiago Rossener" width="200">
+<img class="img-rounded" src="/assets/img/uploads/profile.jpg" alt="Grzegorz Bułat" width="200">
 
 # About
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Software developer, programming enthusiast. Proud father of greatest daughter in world. I have over 7 years of professional experience, mostly in financial and vindication domain, building wildly understood back-end systems.
+
+Love simplicity and self explanatory code. I have a lot of fun building tools and libraries for developers. 
+
