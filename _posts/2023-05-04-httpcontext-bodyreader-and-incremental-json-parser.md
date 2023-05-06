@@ -269,7 +269,10 @@ static bool TryParseFromJson(ref ReadOnlySequence<byte> buffer, ref JsonReaderSt
 }
 ```
 
-And that's it. We are parsing json incrementally with low-allocation method! 🔥
+> **_NOTE:_** What's important, is how and where this implementation is going to be executed.
+If this will be final processing of upcoming http request for example, we should remember about completing pipeReader. If this going to be just step in middleware, executed before actual handler - we need to [EnableBuffering](https://devblogs.microsoft.com/dotnet/re-reading-asp-net-core-request-bodies-with-enablebuffering/) in order to make it possible to read request multiple times, and also rewind it to begging after we finish.    
+
+Other then this that's it. We are parsing json incrementally with low-allocation method! 🔥
 
 ---
 
