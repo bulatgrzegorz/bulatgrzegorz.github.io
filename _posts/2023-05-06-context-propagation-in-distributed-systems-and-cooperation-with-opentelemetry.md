@@ -42,3 +42,170 @@ Am not going to write another post explaining how to integrate OpenTelemetry wit
 
 What I would like to introduce, is the ease in which you can integrate your communication library with tracing and allow users to use it in unified and simple way.
 
+https://github.com/dotnet/aspnetcore/blob/55f7089461d58a38951762b57be32e0cda199d90/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs#L159
+
+```csharp
+public class OutgoingMiddleware
+{
+    public async Task Execute(Context context, Func<Task> next)
+    {
+        var activitySource = new ActivitySource("YourName");
+        var activity = StartActivity(activitySource, context);
+
+        try
+        {
+            await next();
+        }
+        catch (Exception e)
+        {
+            activity?.MarkAsFailed(e);
+            throw;
+        }
+        finally
+        {
+            activity?.Dispose();
+        }
+    }
+
+    private static Activity? StartActivity(ActivitySource activitySource, Context context)
+    {
+        if (activitySource.HasListeners() == false)
+        {
+            return null;
+        }
+
+        var activityName = $"{context.Topic} publish";
+        var activity = activitySource.CreateActivity(activityName, ActivityKind.Producer);
+
+        if (activity is null)
+        {
+            return null;
+        }
+            
+        activity.Start();
+            
+        var propagator = DistributedContextPropagator.Current;
+        propagator.Inject(activity, context, static (carrier, name, value) =>
+        {
+            var messageContext = (Context)carrier!;
+            messageContext.Headers.TryAdd(name, value);
+        });
+
+        return activity;
+    }
+}
+
+public class IncomingMiddleware
+{
+    public async Task Execute(Context context, Func<Task> next)
+    {
+        var activitySource = new ActivitySource("YourName");
+        var activity = StartActivity(activitySource, context);
+
+        try
+        {
+            await next();
+        }
+        catch (Exception e)
+        {
+            activity?.MarkAsFailed(e);
+            throw;
+        }
+        finally
+        {
+            activity?.Dispose();
+        }
+    }
+
+    private static Activity? StartActivity(ActivitySource activitySource, Context context)
+    {
+        if (!activitySource.HasListeners())
+        {
+            return default;
+        }
+        
+        var propagator = DistributedContextPropagator.Current;
+        propagator.ExtractTraceIdAndState(context,
+            static (object? carrier, string name, out string? value, out IEnumerable<string>? values) =>
+            {
+                values = default;
+                var context = (Context)carrier!;
+                context.Headers.TryGetValue(name, out value);
+            }, out var requestId, out var traceState);
+        
+        Activity? activity;
+        
+        //check topic
+        var activityName = $"{context.Topic} process";
+        if (ActivityContext.TryParse(requestId, traceState, true, out var activityContext))
+        {
+            //info
+            activity = activitySource.CreateActivity(activityName, ActivityKind.Producer, activityContext);
+        }
+        else
+        {
+            activity = activitySource.CreateActivity(activityName, ActivityKind.Producer, string.IsNullOrEmpty(requestId) ? null : requestId);
+        }
+
+        if (activity is null)
+        {
+            return default;
+        }
+        
+        if (!string.IsNullOrEmpty(requestId))
+        {
+            if (!string.IsNullOrEmpty(traceState))
+            {
+                //required?
+                activity.TraceStateString = traceState;
+            }
+            
+            var baggage = propagator.ExtractBaggage(context, static (object? carrier, string fieldName, out string? fieldValue, out IEnumerable<string>? fieldValues) =>
+            {
+                fieldValues = default;
+                var context = (Context)carrier!;
+                context.Headers.TryGetValue(fieldName, out fieldValue);
+            });
+
+            // AddBaggage adds items at the beginning  of the list, so we need to add them in reverse to keep the same order as the client
+            // By contract, the propagator has already reversed the order of items so we need not reverse it again
+            // Order could be important if baggage has two items with the same key (that is allowed by the contract)
+            if (baggage is not null)
+            {
+                foreach (var baggageItem in baggage)
+                {
+                    activity.AddBaggage(baggageItem.Key, baggageItem.Value);
+                }
+            }
+        }
+        
+        return activity.Start();
+    }
+}   
+
+public class Context
+{
+    public string Topic { get; set; }
+    
+    public Dictionary<string, string> Headers { get; set; }
+}
+
+public static class ActivityExtensions
+{
+    public static void MarkAsFailed(this Activity activity, Exception exception)
+    {
+        activity.AddEvent(new ActivityEvent("exception", tags: new ActivityTagsCollection
+        {
+            //TODO:
+            // Indicates that the exception is not handled within the scope of
+            // the current span and will propagate to a higher level.
+            ["exception.escaped"] = true,
+            ["exception.message"] = exception.Message,
+            ["exception.stacktrace"] = exception.StackTrace,
+            ["exception.type"] = exception.GetType().FullName,
+        }));
+        
+        activity.SetStatus(ActivityStatusCode.Error);
+    }
+}
+```
