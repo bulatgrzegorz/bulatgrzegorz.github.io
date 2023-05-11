@@ -31,10 +31,10 @@ Nevertheless we will end up with executions that are being handled by separate p
 In past there we had multiple libraries, code circulate on stackoverflow that was supposed to handle those correlations for us. Problem, as usually was with such local solutions - no standardization.
 
 This has changed with publication and popularization of [W3C Recommendation of TraceContext](https://www.w3.org/TR/trace-context/#trace-context-http-headers-format). It does defines HTTP headers and their value format that should be used in order to propagate context information across distributed systems. Later also other protocols was described (however for now only as internal documents - without official standing):
- * MQTT: https://w3c.github.io/trace-context-mqtt/
- * AMQP: https://w3c.github.io/trace-context-amqp/
+ * [MQTT](https://w3c.github.io/trace-context-mqtt/)
+ * [AMQP](https://w3c.github.io/trace-context-amqp/)
 
-About tracing in asynchronous communication in messaging systems I highly recommend OpenTelemetry specification: https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/messaging/.
+About tracing in asynchronous communication in messaging systems I highly recommend OpenTelemetry [specification](https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/messaging/).
 
 # Usage
 
@@ -45,17 +45,17 @@ First, lets understand few constructs that we are going to be using.
 
 ## Activity
 
-In .NET it is representation of unit of work in trace. While whole trace is represented by tree of those, that potentially took place in many different processes. Other common name for such constructs you can find is "Span" - for example used in OpenTelemetry.  
+In .NET Activity is a representation of unit of work in trace. While whole trace is represented by tree of activities. Each activity could potentially took place in different processes. Other common name for such constructs you can find is "Span" - for example used in OpenTelemetry.  
 
 ![system](/assets/img/posts/contextpropagation/activity_trace.png)
 
 Tree structure as shown above allowing us to track sub operations of root action and investigate them individually.
-Activities contains information about operation name, identifiers, start time, duration, tags, events, and baggage and others.
+Activities contains information about operation name, identifiers, start time, duration, tags, events, baggage and others.
 
 ### Identifiers
 
 To be able to build trace hierarchy, each activity records trace id, its own span id and parent span id. Trace id is an unchanging value for whole lifetime of trace, it is being generated as root level, and being passed to each span.
-Span id is being generated with each new Activity and is identifying it uniquely. Parent span id is just span id of parent activity (in context of tree).
+Span id is being generated for each new Activity and it is identifying it uniquely. Parent span id is just span id of parent activity (in context of tree).
 
 ![system](/assets/img/posts/contextpropagation/activity_id.png)
 
@@ -63,7 +63,7 @@ Span id is being generated with each new Activity and is identifying it uniquely
 
 ### Operation name
 
-Operation name should identify work of action in human-readable form. It should be most general thing that is useful for grouping and filtering. For example it could be something like: "GetAccount", "CalculateProvision", "/products/{productId}" - but shouldn't be very specific, with high cardinality - like "/products/51241".
+Operation name should identify work of action in human-readable form. It should be most general thing that is useful for grouping and filtering. For example it could be something like: `"GetAccount"`, `"CalculateProvision"`, `"/products/{productId}"` - but shouldn't be very specific, with high cardinality - like `"/products/51241"`.
 
 ### Time
 
@@ -76,8 +76,9 @@ More details about Activity and its data can be found [here](https://learn.micro
 
 Although activities can be created by them own (using constructor), it is highly recommended to use [ActivitySource](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activitysource?view=net-7.0) for that. 
 
-Using it we enabling sampling traces rather then using all that are being created. `ActivitySource` keeps track of `listeners` that can filter which activities (and their data) there are interested in.
-Because of those mechanisms, when creating activity (and specifying their details) that no one is interested in, activity can not be created (null is returned).
+One of important reasons for it is that `ActivitySource` keeps track of `listeners`. Each `listener` can setup its own sampling conditions that enabling him to listen just the subset of created activities rather then all of them. This can have big impact to overall performance of application. 
+
+Because of those mechanisms, when creating activity (and specifying their details) that no one is interested in, activity can not be created (`null` is returned).
 
 Typically, an `ActivitySource` is created once per application, for example in static context:
 ```csharp
@@ -104,7 +105,7 @@ Abstract class that contains implementation of how distributed context should be
 It's exposing methods to inject activity into carrier, extract activity id and trace state from carrier, and others.
 
 We have three built in implementations:
-* LegacyPropagator (default one)\
+* LegacyPropagator `(default one)`\
 It will extract and inject headers with names of "tracestate" and "traceparent" identifier which are formatted according to W3C standard.
 * PassThroughPropagator\
 It will act transparently, using root activity as data source, ignoring all intermediate activities created while processing the request.
@@ -118,7 +119,7 @@ Will use `LegacyPropagator` for extraction, but will not inject anything.
 # Sample code
 
 We will implement two sample middleware's - one for outgoing message, one for incoming.
-Outgoing middleware:
+
 ```csharp
 public class OutgoingMiddleware
 {
@@ -143,8 +144,8 @@ public class OutgoingMiddleware
 
     private static Activity? StartActivity(MessageContext context)
     {
-        var activityName = $"{context.Topic} publish";
-        var activity = CustomActivitySource.StartActivity(activityName, ActivityKind.Producer);
+        var operationName = $"{context.Topic} publish";
+        var activity = CustomActivitySource.StartActivity(operationName, ActivityKind.Producer);
 
         if (activity is null)
         {
@@ -163,7 +164,7 @@ public class OutgoingMiddleware
 }
 ```
 
-Whole process is pretty straight forward. We starting activity with specific name and kind. If activity was created (it wasn't filtered out) we injecting distributed context to our exemplary `MessageContext`.
+Whole process is pretty straight forward. We starting activity with specific operation name and kind. If activity was created (it wasn't sampled out) we injecting distributed context to our `MessageContext`.
 
 Incoming middleware is little bit more complex:
 
@@ -207,14 +208,14 @@ public class IncomingMiddleware
         
         Activity? activity;
         
-        var activityName = $"{context.Topic} process";
+        var operationName = $"{context.Topic} process";
         if (ActivityContext.TryParse(requestId, traceState, true, out var activityContext))
         {
-            activity = activitySource.CreateActivity(activityName, ActivityKind.Producer, activityContext);
+            activity = activitySource.CreateActivity(operationName, ActivityKind.Producer, activityContext);
         }
         else
         {
-            activity = activitySource.CreateActivity(activityName, ActivityKind.Producer, string.IsNullOrEmpty(requestId) ? null : requestId);
+            activity = activitySource.CreateActivity(operationName, ActivityKind.Producer, string.IsNullOrEmpty(requestId) ? null : requestId);
         }
 
         if (activity is null)
@@ -224,7 +225,8 @@ public class IncomingMiddleware
         
         if (!string.IsNullOrEmpty(requestId))
         {
-            var baggage = propagator.ExtractBaggage(context, static (object? carrier, string fieldName, out string? fieldValue, out IEnumerable<string>? fieldValues) =>
+            var baggage = propagator.ExtractBaggage(context, 
+            static (object? carrier, string fieldName, out string? fieldValue, out IEnumerable<string>? fieldValues) =>
             {
                 fieldValues = default;
                 var context = (MessageContext)carrier!;
@@ -245,14 +247,23 @@ public class IncomingMiddleware
 }
 ```
 
+Using distributed propagator we trying to extract propagated context from our `MessageContext`. If one wasn't found, we will just create plain new `Activity`.
+If we extracted data, and it was successfully parsed by `ActivityContext` we are using those to create activity with parent data.
+
+Lastly we also propagate extracted baggage to newly `Activity`.
+
+`MessageContext` class that we used in our sample it's just class that contains key/value pair collection that we are sending and collecting from some protocol: 
 ```csharp
-public class Context
+public class MessageContext
 {
     public string Topic { get; set; }
     
     public Dictionary<string, string> Headers { get; set; }
 }
+```
 
+We also used little extension method, that was helpful in marking our `Activity` as failed if some exception occurred while processing next steps in middleware pipeline.  
+```csharp
 public static class ActivityExtensions
 {
     public static void MarkAsFailed(this Activity activity, Exception exception)
@@ -270,5 +281,20 @@ public static class ActivityExtensions
 }
 ```
 
+Above implementations was highly inspired by one used in [AspNetCore](https://github.com/dotnet/aspnetcore/blob/55f7089461d58a38951762b57be32e0cda199d90/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs#L46), where activity is created when http request comes in.
 
-https://github.com/dotnet/aspnetcore/blob/55f7089461d58a38951762b57be32e0cda199d90/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs#L159
+Having all of this we can already integrate our communication library with tracing and propagate context. What's great about this implantation is that if nobody will listen for our activity source and activities it will cost us close to nothing.
+
+Speaking about listeners, those days easiest way to integrate with tracing is `OpenTelemetry`. To make it easy for library clients, we can also prepare little extension method that will start listener:
+
+```csharp
+public static class OpenTelemetryTracingExtensions
+{
+    public static TracerProviderBuilder AddInstrumentation(this TracerProviderBuilder builder)
+    {
+        return builder.AddSource("AppName");
+    }
+}
+```
+
+What's important is to use same value in `AddSource` method, as we configured in our `ActivitySource` instance.
