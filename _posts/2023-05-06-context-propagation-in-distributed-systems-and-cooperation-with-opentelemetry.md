@@ -23,7 +23,7 @@ paginate: false
 # Tracing introduction
 
 While building software systems sooner or later you will come across communication that happens between some separate components.
-It could be front-end calling back-end, it could be distributed microservice architecture deployed over huge cluster.
+It could be front-end calling back-end, it could be communication in distributed microservice architecture deployed over huge cluster.
 Nevertheless we will end up with executions that are being handled by separate processes - and finally we would probably like to correlate them in order to investigate some problems, analyze performance bottlenecks or just read logs from those separate processes joint together.
 
 ![system](/assets/img/posts/contextpropagation/system_graph.png)
@@ -285,7 +285,7 @@ Above implementations was highly inspired by one used in [AspNetCore](https://gi
 
 Having all of this we can already integrate our communication library with tracing and propagate context. What's great about this implantation is that if nobody will listen for our activity source and activities it will cost us close to nothing.
 
-Speaking about listeners, those days easiest way to integrate with tracing is `OpenTelemetry`. To make it easy for library clients, we can also prepare little extension method that will start listener:
+Speaking about listeners, those days easiest way to integrate with tracing is `OpenTelemetry`. To make it easy for library clients, we can also prepare little extension method that will start listener (it will require `OpenTelemetry` library to be installed):
 
 ```csharp
 public static class OpenTelemetryTracingExtensions
