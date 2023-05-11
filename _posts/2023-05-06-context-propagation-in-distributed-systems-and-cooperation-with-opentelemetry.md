@@ -41,16 +41,90 @@ About tracing in asynchronous communication in messaging systems I highly recomm
 Am not going to write another post explaining how to integrate OpenTelemetry with your C# project. There are already many materials explaining it in great details (starting with OpenTelemetry [site](https://opentelemetry.io/docs/instrumentation/net/getting-started/)), and this is also not topic of this post.
 
 What I would like to introduce, is the ease in which you can integrate your communication library with tracing and allow users to use it in unified and simple way.
+First, lets understand few constructs that we are going to be using.
 
-https://github.com/dotnet/aspnetcore/blob/55f7089461d58a38951762b57be32e0cda199d90/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs#L159
+## Activity
 
+In .NET it is representation of unit of work in trace. While whole trace is represented by tree of those, that potentially took place in many different processes. Other common name for such constructs you can find is "Span" - for example used in OpenTelemetry.  
+
+![system](/assets/img/posts/contextpropagation/activity_trace.png)
+
+Tree structure as shown above allowing us to track sub operations of root action and investigate them individually.
+Activities contains information about operation name, identifiers, start time, duration, tags, events, and baggage and others.
+
+### Identifiers
+
+To be able to build trace hierarchy, each activity records trace id, its own span id and parent span id. Trace id is an unchanging value for whole lifetime of trace, it is being generated as root level, and being passed to each span.
+Span id is being generated with each new Activity and is identifying it uniquely. Parent span id is just span id of parent activity (in context of tree).
+
+![system](/assets/img/posts/contextpropagation/activity_id.png)
+
+> Note: Above description is describing W3C standard of trace identifiers [TraceContext](https://www.w3.org/TR/trace-context/). It is being default scheme in .NET staring from version 5. Before that - "Hierarchical" scheme was used, that is not going to be described here. 
+
+### Operation name
+
+Operation name should identify work of action in human-readable form. It should be most general thing that is useful for grouping and filtering. For example it could be something like: "GetAccount", "CalculateProvision", "/products/{productId}" - but shouldn't be very specific, with high cardinality - like "/products/51241".
+
+### Time
+
+Each started activity captures current time that is being used to calculate Duration when its stops. 
+
+### Others
+More details about Activity and its data can be found [here](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-concepts).
+
+## ActivitySource
+
+Although activities can be created by them own (using constructor), it is highly recommended to use [ActivitySource](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.activitysource?view=net-7.0) for that. 
+
+Using it we enabling sampling traces rather then using all that are being created. `ActivitySource` keeps track of `listeners` that can filter which activities (and their data) there are interested in.
+Because of those mechanisms, when creating activity (and specifying their details) that no one is interested in, activity can not be created (null is returned).
+
+Typically, an `ActivitySource` is created once per application, for example in static context:
+```csharp
+public static class ApplicationTracing
+{
+    public static readonly ActivitySource AppActivitySource = new("AppName");
+}
+```
+
+Using this instance we can create our application activities by calling:
+```csharp
+var activity = ApplicationTracing.AppActivitySource.StartActivity("operation name");
+```
+That will create (taking sampling and filtering into account) and start activity.
+
+## ActivityContext
+
+Struct containing information about W3C TraceContext.
+
+## DistributedContextPropagator
+
+Abstract class that contains implementation of how distributed context should be encoded/decoded and propagated. It's transport agnostic, and can work over anything that supports string key-value pairs (like http headers). 
+
+It's exposing methods to inject activity into carrier, extract activity id and trace state from carrier, and others.
+
+We have three built in implementations:
+* LegacyPropagator (default one)\
+It will extract and inject headers with names of "tracestate" and "traceparent" identifier which are formatted according to W3C standard.
+* PassThroughPropagator\
+It will act transparently, using root activity as data source, ignoring all intermediate activities created while processing the request.
+* NoOutputPropagator\
+Will use `LegacyPropagator` for extraction, but will not inject anything.
+  > Will not inject anything other then baggage - that is being handled by `DistributedContextPropagator` itself.
+  
+  It could be usefully when we just want to extend baggage collection, without interfering in propagated context itself.
+
+
+# Sample code
+
+We will implement two sample middleware's - one for outgoing message, one for incoming.
+Outgoing middleware:
 ```csharp
 public class OutgoingMiddleware
 {
-    public async Task Execute(Context context, Func<Task> next)
+    public async Task Execute(MessageContext context, Func<Task> next)
     {
-        var activitySource = new ActivitySource("YourName");
-        var activity = StartActivity(activitySource, context);
+        var activity = StartActivity(context);
 
         try
         {
@@ -67,40 +141,38 @@ public class OutgoingMiddleware
         }
     }
 
-    private static Activity? StartActivity(ActivitySource activitySource, Context context)
+    private static Activity? StartActivity(MessageContext context)
     {
-        if (activitySource.HasListeners() == false)
-        {
-            return null;
-        }
-
         var activityName = $"{context.Topic} publish";
-        var activity = activitySource.CreateActivity(activityName, ActivityKind.Producer);
+        var activity = CustomActivitySource.StartActivity(activityName, ActivityKind.Producer);
 
         if (activity is null)
         {
             return null;
         }
             
-        activity.Start();
-            
         var propagator = DistributedContextPropagator.Current;
         propagator.Inject(activity, context, static (carrier, name, value) =>
         {
-            var messageContext = (Context)carrier!;
+            var messageContext = (MessageContext)carrier!;
             messageContext.Headers.TryAdd(name, value);
         });
 
         return activity;
     }
 }
+```
 
+Whole process is pretty straight forward. We starting activity with specific name and kind. If activity was created (it wasn't filtered out) we injecting distributed context to our exemplary `MessageContext`.
+
+Incoming middleware is little bit more complex:
+
+```csharp
 public class IncomingMiddleware
 {
-    public async Task Execute(Context context, Func<Task> next)
+    public async Task Execute(MessageContext context, Func<Task> next)
     {
-        var activitySource = new ActivitySource("YourName");
-        var activity = StartActivity(activitySource, context);
+        var activity = StartActivity(context);
 
         try
         {
@@ -117,9 +189,9 @@ public class IncomingMiddleware
         }
     }
 
-    private static Activity? StartActivity(ActivitySource activitySource, Context context)
+    private static Activity? StartActivity(MessageContext context)
     {
-        if (!activitySource.HasListeners())
+        if (!CustomActivitySource.HasListeners())
         {
             return default;
         }
@@ -129,17 +201,15 @@ public class IncomingMiddleware
             static (object? carrier, string name, out string? value, out IEnumerable<string>? values) =>
             {
                 values = default;
-                var context = (Context)carrier!;
+                var context = (MessageContext)carrier!;
                 context.Headers.TryGetValue(name, out value);
             }, out var requestId, out var traceState);
         
         Activity? activity;
         
-        //check topic
         var activityName = $"{context.Topic} process";
         if (ActivityContext.TryParse(requestId, traceState, true, out var activityContext))
         {
-            //info
             activity = activitySource.CreateActivity(activityName, ActivityKind.Producer, activityContext);
         }
         else
@@ -149,27 +219,18 @@ public class IncomingMiddleware
 
         if (activity is null)
         {
-            return default;
+            return null;
         }
         
         if (!string.IsNullOrEmpty(requestId))
         {
-            if (!string.IsNullOrEmpty(traceState))
-            {
-                //required?
-                activity.TraceStateString = traceState;
-            }
-            
             var baggage = propagator.ExtractBaggage(context, static (object? carrier, string fieldName, out string? fieldValue, out IEnumerable<string>? fieldValues) =>
             {
                 fieldValues = default;
-                var context = (Context)carrier!;
+                var context = (MessageContext)carrier!;
                 context.Headers.TryGetValue(fieldName, out fieldValue);
             });
 
-            // AddBaggage adds items at the beginning  of the list, so we need to add them in reverse to keep the same order as the client
-            // By contract, the propagator has already reversed the order of items so we need not reverse it again
-            // Order could be important if baggage has two items with the same key (that is allowed by the contract)
             if (baggage is not null)
             {
                 foreach (var baggageItem in baggage)
@@ -181,8 +242,10 @@ public class IncomingMiddleware
         
         return activity.Start();
     }
-}   
+}
+```
 
+```csharp
 public class Context
 {
     public string Topic { get; set; }
@@ -196,9 +259,6 @@ public static class ActivityExtensions
     {
         activity.AddEvent(new ActivityEvent("exception", tags: new ActivityTagsCollection
         {
-            //TODO:
-            // Indicates that the exception is not handled within the scope of
-            // the current span and will propagate to a higher level.
             ["exception.escaped"] = true,
             ["exception.message"] = exception.Message,
             ["exception.stacktrace"] = exception.StackTrace,
@@ -209,3 +269,6 @@ public static class ActivityExtensions
     }
 }
 ```
+
+
+https://github.com/dotnet/aspnetcore/blob/55f7089461d58a38951762b57be32e0cda199d90/src/Hosting/Hosting/src/Internal/HostingApplicationDiagnostics.cs#L159
