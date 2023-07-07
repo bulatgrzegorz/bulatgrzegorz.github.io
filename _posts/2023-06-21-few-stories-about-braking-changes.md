@@ -1,7 +1,7 @@
 ---
 date: 2023-06-21 13:27:58
 layout: post
-title: "Few stories about braking changes"
+title: "Few stories about breaking changes"
 subtitle:
 description: >-
   Examples of changes that are not obvious breaking changes in libraries code
@@ -17,25 +17,25 @@ author: bulatgrzegorz
 paginate: false
 ---
 
-# Braking change
+# Breaking change
 
-Just for start, we may actually try deciding what "braking change" actually means. In software we could generalize it as any change that make code stop running or compiling ([link](https://stackoverflow.com/a/21703427)).
+Just for start, we may actually try deciding what "Breaking change" actually means. In software we could generalize it as any change that make code stop running or compiling ([link](https://stackoverflow.com/a/21703427)).
 
 More specific definition of `compatibility` can be found [here](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/version-update-considerations), where term was divided into specific types. Below we will show some examples of non-binary-compatible changes.
 
 And as we can easily imagine many of such changes. Where there are some (in .NET world) that seems not so obvious at first glance.
 
-Many of those we can find when creating .NET libraries. Some changes that wouldn't be normally considered braking will be one when introduced in some specific usage situations.
+Many of those we can find when creating .NET libraries. Some changes that wouldn't be normally considered breaking will be one when introduced in some specific usage situations.
 
-How much library changes can effect in braking changes can differ in how it is being used. We can distinguish two main types:
+How much library changes can effect in breaking changes can differ in how it is being used. We can distinguish two main types:
 
 ### High-level library
 
-This kind of libraries are less sensitive to braking changes - those libraries are being referenced directly in client’s application
+This kind of libraries are less sensitive to breaking changes - those libraries are being referenced directly in client’s application
 
 ![dependency-diagram](/assets/img/posts/breakingchanges/high-level-lib-diagram.png)
 
-Those are less sensitive, because even when braking change was introduced, client can decide to change version of it or just modify application itself.
+Those are less sensitive, because even when breaking change was introduced, client can decide to change version of it or just modify application itself.
 
 ### Low-level library
 
@@ -47,9 +47,9 @@ Hardest in maintaining backward compatibility are low-level libraries, that are 
 
 We will only describe some examples of breaking changes that in my perspective are quite easy to be missed.
 
-## Method parameters braking change
+## Method parameters breaking change
 
-In this example, we will discussing binary braking change while developing low-level libraries changes that wouldn't be such in normal application code or high-level libraries.
+In this example, we will discussing binary breaking change while developing low-level libraries changes that wouldn't be such in normal application code or high-level libraries.
 
 Let's examine such code example:
 
@@ -113,7 +113,7 @@ public static class LowLevelClass
 
 This way overload of method with just one parameter still exists, making high-level library to work correctly, while in same time we can use overload with new parameter as well in client code.
 
-## Method return type braking change
+## Method return type breaking change
 
 Same exception would happen if we would try to change return type (even if such is not being used anywhere):
 ```csharp
@@ -127,9 +127,9 @@ Why this isn't allowed has been explained in great stackoverflow [answer](https:
 
 > **_NOTE:_** What's important, is will not work with **any** change of return type - base class to derived or vice versa, etc.
 
-## New struct fields braking change
+## New struct fields breaking change
 
-Another interesting example of non-backward compatible change is adding new instance field to struct that didn't have any non-public fields already. This change other than previous one will be braking for high-level libraries as well as normal internal app code.
+Another interesting example of non-backward compatible change is adding new instance field to struct that didn't have any non-public fields already. This change other than previous one will be breaking for high-level libraries as well as normal internal app code.
 Let's examine this struct example:
 
 ```csharp
@@ -146,7 +146,7 @@ example.X = 1;
 Console.WriteLine(example.X);
 ```
 
-Now, adding non-public field will result in braking changes:
+Now, adding non-public field will result in breaking changes:
 ```csharp
 public struct ExampleStruct
 {
@@ -161,7 +161,7 @@ public struct ExampleStruct
 
 Because there weren’t any non-public fields to this moment - compiler has no initialized fields at creation time. To fix it, client will need to use constructor or initialize struct to `default`.
 
-We will result in braking change also by adding public field:
+We will result in Breaking change also by adding public field:
 ```csharp
 public struct ExampleStruct
 {
@@ -171,7 +171,7 @@ public struct ExampleStruct
 ```
 Client will be requiring initializing struct as above or setup value of `Y` same as `X` was.
 
-## Method overload with braking behavior
+## Method overload with Breaking behavior
 
 Imagine following method exposed in some library:
 
@@ -202,7 +202,7 @@ public static class HighLevelClass
 }
 ```
 
-Now after client updates library dependency and recompiling its code, will use new method overload with `int` parameter (compiler will no longer cast value and use `int` overload). This can introduce behavior braking change, as new overload of method can introduce different implementation then existing one.
+Now after client updates library dependency and recompiling its code, will use new method overload with `int` parameter (compiler will no longer cast value and use `int` overload). This can introduce behavior breaking change, as new overload of method can introduce different implementation then existing one.
 
 # Summary
 
