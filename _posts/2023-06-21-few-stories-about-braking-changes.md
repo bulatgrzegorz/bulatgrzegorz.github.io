@@ -1,3 +1,22 @@
+---
+date: 2023-06-21 13:27:58
+layout: post
+title: "Few stories about braking changes"
+subtitle:
+description: >-
+  Examples of changes that are not obvious breaking changes in libraries code
+image: >-
+  https://res.cloudinary.com/dljcybafb/image/upload/v1687955279/blog/broken_qexurd.jpg
+optimized_image: >-
+  https://res.cloudinary.com/dljcybafb/image/upload/c_scale,w_380/v1687955279/blog/broken_qexurd.jpg
+category: blog
+tags:
+  - c#
+  - libraries
+author: bulatgrzegorz
+paginate: false
+---
+
 # Braking change
 
 Just for start, we may actually try deciding what "braking change" actually means. In software we could generalize it as any change that make code stop running or compiling ([link](https://stackoverflow.com/a/21703427)).
