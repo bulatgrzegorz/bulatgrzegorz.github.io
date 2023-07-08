@@ -23,7 +23,7 @@ Just for start, we may actually try deciding what "Breaking change" actually mea
 
 More specific definition of `compatibility` can be found [here](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/version-update-considerations), where term was divided into specific types. Below we will show some examples of non-binary-compatible changes.
 
-And as we can easily imagine many of such changes. Where there are some (in .NET world) that seems not so obvious at first glance.
+And as we can easily imagine many of such changes, there are some (in .NET world) that seems not so obvious at first glance.
 
 Many of those we can find when creating .NET libraries. Some changes that wouldn't be normally considered breaking will be one when introduced in some specific usage situations.
 
