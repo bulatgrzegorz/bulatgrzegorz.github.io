@@ -93,11 +93,11 @@ Unhandled exception. System.MissingMethodException: Method not found: 'Void low_
 
 ![impossible](/assets/img/posts/breakingchanges/thats-impossible.gif)
 
-That's happening because how optional parameters are being handled by compiler. Let's check lowered code of our client code after library has been updated:
+That's happening because how optional parameters are being handled by compiler. Let's check lowered version of our client code after library has been updated:
 ```csharp
 LowLevelClass.Method(1, (string) null);
 ```
-Method invocation was effectively converted to call using all parameters. This is not happening in high-level library that was already compiled against old version of low-level and such "conversion" didn't happen.
+Method invocation was effectively converted to call using all parameters. This is not happening in high-level library that was already compiled against old version of low-level library and such "conversion" didn't happen.
 
 There are few solutions to this problem, we could either:
 * Recompile high-level library using new version of low-level library
@@ -111,7 +111,7 @@ public static class LowLevelClass
 }
 ```
 
-This way overload of method with just one parameter still exists, making high-level library to work correctly, while in same time we can use overload with new parameter as well in client code.
+This way overload of method with just one parameter will still exists, making high-level library works correctly, while in same time we can use overload with new parameter as well in clients code.
 
 ## Method return type breaking change
 
@@ -125,7 +125,7 @@ public static class LowLevelClass
 
 Why this isn't allowed has been explained in great stackoverflow [answer](https://stackoverflow.com/a/9179426).   
 
-> **_NOTE:_** What's important, is will not work with **any** change of return type - base class to derived or vice versa, etc.
+> **_NOTE:_** What's important, is that it will not work with **any** change of return type - base class to derived or vice versa, etc.
 
 ## New struct fields breaking change
 
@@ -139,7 +139,7 @@ public struct ExampleStruct
 }
 ```
 
-Caller can use such structs without calling constructor or initializing the local to `default` (as long as all public fields will be setup):
+Caller can use such structs without calling constructor or initializing the local to `default` (as long as all public fields are setup):
 ```csharp
 ExampleStruct example;
 example.X = 1;
@@ -159,9 +159,9 @@ public struct ExampleStruct
 [CS0165] Use of unassigned local variable 'example'
 ```
 
-Because there weren’t any non-public fields to this moment - compiler has no initialized fields at creation time. To fix it, client will need to use constructor or initialize struct to `default`.
+Because there weren’t any non-public fields to this moment - compiler didn't initialized fields at creation time. To fix it, client will need to use constructor or initialize struct to `default`.
 
-We will result in Breaking change also by adding public field:
+We will end up in breaking change also by adding public field:
 ```csharp
 public struct ExampleStruct
 {
@@ -169,7 +169,7 @@ public struct ExampleStruct
     public int Y;
 }
 ```
-Client will be requiring initializing struct as above or setup value of `Y` same as `X` was.
+Client will be required to initialize struct as above or setup value of `Y` same as `X` was.
 
 ## Method overload with Breaking behavior
 
@@ -202,7 +202,7 @@ public static class HighLevelClass
 }
 ```
 
-Now after client updates library dependency and recompiling its code, will use new method overload with `int` parameter (compiler will no longer cast value and use `int` overload). This can introduce behavior breaking change, as new overload of method can introduce different implementation then existing one.
+and client updates library dependency and recompiling its code, will use new method overload with `int` parameter (compiler will no longer cast value and use `int` overload). This can introduce behavior breaking change, as new overload of method can introduce different implementation then existing one.
 
 # Summary
 
