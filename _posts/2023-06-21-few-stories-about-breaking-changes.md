@@ -85,7 +85,7 @@ public class LowLevelClass
 }
 ```
 and reference new version of library implicitly in client project. Everything compiling fine, but after running client code we are getting exception:
-```
+```console
 Unhandled exception. System.MissingMethodException: Method not found: 'Void low_level_lib.LowLevelClass.Method(Int32)'.
    at high_level_lib.HighLevelClass.Method()
    at Program.<Main>$(String[] args) in ...\Program.cs:line 4
