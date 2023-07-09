@@ -1,5 +1,5 @@
 pre {
-  background: #282a36;
+  background: #f0f0f0;
   width: 100%;
   padding: rem(20px) 0;
   color: $accentDark;
@@ -24,19 +24,24 @@ pre {
   span {
     line-height: 1.5rem;
     font-family: "Monaco", "Consolas", "Menlo", monospace;
+    color: #000
   }
 }
 
 .highlight {
-  margin: rem(20px) 0;
+  @include center(rem(800px));
+  margin: rem(20px) auto 0;
+  &.fullwidth {
+    padding: rem(60px) rem(10px) 0;
+  }
 
   @include media(">=sm") {
     word-wrap: break-word;
-    margin: rem(29px) 0;
+    margin: rem(29px) auto 0;
   }
 
   .hll {
-    background-color: #282a36;
+    background-color: #f0f0f0;
   }
 
   .c,     // Comment
@@ -57,7 +62,7 @@ pre {
   .kr,    // Keyword.Reserved
   .kt,    // Keyword.Type
   .no {   // Name.Constant
-    color: #66d9ef;
+    color: #008;
   }
 
   .l,     // Literal 
@@ -67,12 +72,12 @@ pre {
   .mo,    // Literal.Number.Oct
   .se,    // Literal.String.Escape
   .il {   // Literal.Number.Integer.Long
-    color: #ae81ff;
+    color: #000;
   }
 
   .p,     // Punctuation
   .nx {   // Name.Other
-    color: #f7f7f2;
+    color: #606;
   }
 
   .ni,    // Name.Entity
@@ -94,7 +99,7 @@ pre {
   .n,     // Name
   .nb,    // Name.Builtin
   .m {    // Literal.Number
-    color: #bd93f9;
+    color: #606;
   }
 
   .nt,    // Name.Tag
@@ -103,7 +108,7 @@ pre {
   .kd,    // Keyword.Declaration
   .o,     // Operator
   .ow {   // Operator.Word
-    color: #ff79c6;
+    color: #008;
   }
 
   .ge {   // Generic.Emph
@@ -127,7 +132,7 @@ pre {
   .s1,     // Literal.String.Single
   .ss,     // Literal.String.Symbol
   .vglnk { // Link
-    color: #f1fa8c;
+    color: #066;
   }
 
   .na,    // Name.Attribute
@@ -135,6 +140,6 @@ pre {
   .nd,    // Name.Decorator
   .ne,    // Name.Exception
   .nf {   // Name.Function
-    color: #50fa7b;
+    color: #606;
   }
 }
