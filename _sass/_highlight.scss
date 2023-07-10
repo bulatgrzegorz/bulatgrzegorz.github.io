@@ -15,7 +15,7 @@ pre {
   code {
     @include center(rem(800px));
     padding: 0 rem(20px);
-
+    color: #282a36;
     @include media("<sm") {
       overflow-x: scroll;
     }
@@ -24,7 +24,7 @@ pre {
   span {
     line-height: 1.5rem;
     font-family: "Monaco", "Consolas", "Menlo", monospace;
-    color: #000
+    color: #282a36
   }
 }
 
@@ -41,7 +41,7 @@ pre {
   }
 
   .hll {
-    background-color: #f0f0f0;
+    background-color: #000;
   }
 
   .c,     // Comment
