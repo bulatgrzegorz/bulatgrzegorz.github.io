@@ -266,3 +266,7 @@ Full code can be found here: [k8s-request-broadcaster](https://github.com/bulatg
 
 Final architecute of solution would look like this:
 ![architecture](/assets/img/posts/broadcastrequest/architecture.png)
+
+* 1 - Client is making call to broadcaster, passing headless-service name, target port and target url address
+* 2 - Broadcaster using headless-service name is making DNS call in order to get destinations IP addresses
+* 3 - Broadcaster is making call to each destination pod (using exact IP address from **(2)** and target port from **(1)**). Body and headers from original request **(1)** are being proxied. 
