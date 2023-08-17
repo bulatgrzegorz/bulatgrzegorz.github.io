@@ -263,3 +263,6 @@ return isSuccessFromAllCalls ? Results.Ok(result) : Results.BadRequest(result);
 ```
 
 Full code can be found here: [k8s-request-broadcaster](https://github.com/bulatgrzegorz/k8s-request-broadcaster).
+
+Final architecute of solution would look like this:
+![architecture](/assets/img/posts/broadcastrequest/architecture.png)
