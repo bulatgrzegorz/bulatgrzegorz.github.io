@@ -316,3 +316,33 @@ I have adjusted threshold after calculating it for first few generation and run 
 
 ![tree-result](/assets/img/posts/adventofcode/christmasTreeFound.jpg)
 >[source](https://www.reddit.com/r/adventofcode/comments/1hts3v2/2024_day_14_part_2_c_how_to_find_the_tree_via/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+
+
+# git-crypt
+
+![encryption](/assets/img/posts/adventofcode/dataencryptionmeme.jpg)
+
+Since the content of Advent of Code is not licensed for reproduction or distribution without permission (including personal input data), I wondered if there was a way to keep my inputs in some encrypted format for easier use.
+
+This is when I first encountered git-crypt (even though I could have been using it much earlier 😫).
+
+[git-crypt](https://github.com/AGWA/git-crypt) is a simple tool that allows you to store secrets in your public repository in an encrypted and secure way. Once configured, it is completely transparent to use—it's as if it was never there.
+
+All that’s required is a key (stored in a file) that is kept on your local computer (it can be shared across different projects to make things even easier). You’ll also need a `.gitattributes` file in your repository to specify which files should be encrypted. In my example, it looks like this:
+
+```
+**/*.input  filter=git-crypt diff=git-crypt
+```
+This will ensure that all files with the `*.input` extension are encrypted.
+
+From now on, any file with the `*.input` extension will be pushed to your repository in an encrypted format, with no further action required from your side.
+
+# Wrapping up
+
+This year Advent Of Code was absolutely tons of fun, even when it kept me up until 3 a.m. 😂
+
+![insomnia](/assets/img/posts/adventofcode/insomnia.jpg)
+
+It gave me the opportunity to grow as a developer, and once again, I found myself diving deep into the internet to learn new things I didn’t know before.
+
+Thanks for reading, and I hope to see you next year! 🎄💻
