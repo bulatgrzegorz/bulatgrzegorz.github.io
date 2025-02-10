@@ -1,5 +1,5 @@
 ---
-date: 2025-02-05 16:15:01
+date: 2025-02-10 16:15:01
 layout: post
 title: "Snapshot Testing with C# and WireMock:"
 subtitle: "How to stop mocking APIs manually and start automating your tests like a wizard 🧙"
