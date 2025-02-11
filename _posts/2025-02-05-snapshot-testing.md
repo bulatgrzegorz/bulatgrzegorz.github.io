@@ -235,4 +235,4 @@ By recording real API interactions once, we eliminate the need for manual mock s
 
 Next Time: We’ll dive into compatibility testing – how to find perfect test scenarios without disturbing real users. Until then, may your tests be green and your mocks be ever-accurate!
 
-Full code example can be found [in this repo]([https://github.com/bulatgrzegorz/snapshot-testing]).
+Full code example can be found [in this repo](https://github.com/bulatgrzegorz/snapshot-testing).
