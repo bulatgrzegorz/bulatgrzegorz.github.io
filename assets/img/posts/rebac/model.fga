@@ -1,0 +1,26 @@
+model
+  schema 1.1
+
+type user
+
+type group
+  relations
+    define member: [user, group]
+
+type folder
+  relations
+    define parent: [folder]
+    define reader: [user, group#member]
+    define writer: [user, group#member]
+
+    define can_read: reader or writer or can_read from parent
+    define can_write: writer or can_write from parent
+
+type document
+  relations
+    define parent: [folder]
+    define reader: [user, group#member]
+    define writer: [user, group#member]
+
+    define can_read: reader or writer or can_read from parent
+    define can_write: writer or can_write from parent
