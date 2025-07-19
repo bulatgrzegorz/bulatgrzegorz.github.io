@@ -35,12 +35,6 @@ It will be easier to go through authorization topic when discussing some system 
 
 At first, with that straight forward model we just collect documents connected to some account, that's it, not much authentication there.
 
-## Admin
-
-From now one, story can get complicated a bit. Easiest thing imagine, new account type might be needed - admin. This special account should be able to access all documents.
-
-From now on, answering simple question: "Is account has access to this document" is already a little bit more complicated, account needs to either have access to document or to be of admin type.
-
 ## Folders
 
 Let's introduce folders (surprise huh?). Requirement is fairly simple, each document might be contained inside folder, each folder might be nested into another folder as well.
@@ -136,10 +130,13 @@ This is the heart of our system. We'll update our model to include reader and wr
 both folders and documents. Crucially, we'll define that writer also implies reader, and that
 permissions are inherited from parent folders.
 
-Let's break down the logic for **can_read** on a document:
+Let's break it down: 
+
+**define reader: [user, group#member]** means that reader might be either some user, but also any member of users group.
+
+**can_read** on a document:
 * **reader or writer**: A user can read if they are a direct reader OR a writer of the document.
-* **...or can_read from parent**: A user can also read the document if they have can_read
-permission on its parent folder. This recursively handles inheritance.
+* **...or can_read from parent**: A user can also read the document if they have **can_read** permission on it's parent folder. This recursively handles inheritance.
 
 ### Deployment
 
@@ -276,7 +273,7 @@ Although above query examples might be enough for some usages, it's very importa
 
 We've covered the fundamentals of OpenFGA, from modeling to querying. While the CLI is an excellent tool for learning and testing, you'll use an SDK in your application code. OpenFGA offers a rich ecosystem of [SDKs](https://openfga.dev/docs/getting-started/install-sdk) for various languages, allowing you to integrate authorization checks and queries seamlessly into your services.
 
-However, the most critical consideration when moving to production is **performance**. While OpenFGA is designed to be extremely fast, a poorly designed model or an inefficient query pattern can still lead to latency. Always consult the official documentation on [performance and scalability](https://openfga.dev/docs/performance-and-scalability) to understand the trade-offs and best practices for your specific use case. Planning for performance from the beginning is key to a successful deployment.
+However, the most critical consideration when moving to production is **performance**. While OpenFGA is designed to be extremely fast, a poorly designed model or an inefficient query pattern can still lead to latency. Always consult the official documentation to understand the trade-offs and best practices for your specific use case. Planning for performance from the beginning is key to a successful deployment.
 
 ### Deeper Dive: Understanding the Modeling Language
 
@@ -307,4 +304,10 @@ The OpenFGA modeling language is surprisingly powerful. While our model only use
 *   **Exclusion (`but not`):** You could grant `can_view` to all `employees` BUT NOT `interns`.
 
 These operators allow you to build highly granular and expressive authorization models that can adapt to complex business rules.
+
+## Wrapping Up
+
+And there you have it! We started with a tangled mess of permissions and ended with a clean, clear, and powerful authorization model. By thinking in terms of relationships, we were able to tame the complexity that often bogs down applications as they grow.
+
+ReBAC and tools like OpenFGA aren't just for massive companies like Google. They provide a practical, scalable, and surprisingly intuitive way to handle permissions for any project. So next time you feel that authorization headache coming on, remember the power of the graph. Happy coding! 🫡
 
