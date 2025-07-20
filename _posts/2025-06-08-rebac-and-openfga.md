@@ -1,5 +1,5 @@
 ---
-date: 2025-02-10 16:15:01
+date: 2025-07-19 16:15:01
 layout: post
 title: "From Chaos to Control: Relationship-Based Access Control (ReBAC) with OpenFG"
 subtitle: "Taming complex permissions in your application without losing your mind"
