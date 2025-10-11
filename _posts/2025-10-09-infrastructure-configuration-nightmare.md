@@ -47,6 +47,8 @@ Oh, and your feature also needs a new database table. Time to repeat this proces
 
 # The Current State: A Maze of Repositories
 
+![maze](/assets/img/posts/infrastucturenightmare/maze.webp)
+
 In large organizations, infrastructure is typically managed by different specialized teams. Naturally each team wants to control changes being made in their part of the system world. What it results in are separated repositories for configuration:
 
 - ☁️ `terraform-infrastructure` - Cloud resource definitions
