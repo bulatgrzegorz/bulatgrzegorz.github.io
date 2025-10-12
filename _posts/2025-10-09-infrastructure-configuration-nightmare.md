@@ -74,7 +74,7 @@ But in practice, it creates something else entirely: **a bottleneck that slows e
 
 # Multi-Repository Fragmentation
 
-![bottleneck](/assets/img/posts/infrastucturenightmare/defragmentation.webp)
+![defragmentation](/assets/img/posts/infrastucturenightmare/defragmentation.webp)
 
 When you need to deploy a feature that touches multiple infrastructure components, you're faced with a coordination nightmare.
 
@@ -249,7 +249,7 @@ You catch yourself after whole day achieving nothing, trying to understand how t
 
 # The Way Forward
 
-![forward](/assets/img/posts/infrastucturenightmare/betterway.jpg)
+![way](/assets/img/posts/infrastucturenightmare/betterway.jpg)
 
 So what's the alternative? **In-codebase infrastructure manifests.**
 
@@ -277,9 +277,6 @@ deploy-to-prod:
     5. Run database migration
     6. Deploy service
     7. Run smoke tests
-
-  rollback: atomic (all or nothing)
-  approvers: dynamic (based on what changed)
 ```
 
 Everything in order. Everything versioned. Everything atomic.
@@ -342,4 +339,4 @@ Your developers shouldn't need tribal knowledge just to create a topic. Your pla
 
 Maybe it's time to wake up.
 
-![bottleneck](/assets/img/posts/infrastucturenightmare/dream.jpg)
+![dream](/assets/img/posts/infrastucturenightmare/dream.jpg)
