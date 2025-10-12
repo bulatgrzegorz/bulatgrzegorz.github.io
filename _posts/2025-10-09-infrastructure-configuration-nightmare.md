@@ -284,6 +284,12 @@ deploy-to-prod:
 
 Everything in order. Everything versioned. Everything atomic.
 
+**Who builds what:**
+
+The key insight is that **platform teams still own the implementation**. They build and maintain the Terraform modules, Ansible playbooks, and deployment scripts. Service teams don't write infrastructure code - they just declare what they need in manifests and invoke the platform-provided tooling from their pipelines.
+
+In centralized repos, platform teams build AND run everything. In the in-codebase approach, platform teams build reusable tools while service teams invoke them. Same expertise, same control, better velocity.
+
 ---
 
 **What changes:**
