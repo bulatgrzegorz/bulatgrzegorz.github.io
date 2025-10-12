@@ -114,7 +114,7 @@ This knowledge is typically scattered across:
 
 Some infrastructure repositories may have **dependencies on each other**, creating a complex chain of prerequisites that must be satisfied in a specific order:
 
-* Proto/Avro schema needs to be created and approved before kafka definition (schema registry)
+* Some infrastructure components need to be created before others (e.g., cloud resources before application secrets)
 * Secrets might need to wait for some resources to be created first
 * etc.
 
@@ -130,7 +130,7 @@ Not only do you need to know:
 You also need to know:
 - Which repos depend on which
 - The correct order to deploy them
-- What information flows between them (schema IDs, endpoints, credentials)
+- What information flows between them (endpoints, credentials)
 - How to test dependencies locally (you usually can't)
 
 # Version Drift & Configuration Mismatches
@@ -190,7 +190,7 @@ Picture this: Your organization has 50 teams, all deploying services. They all s
 
 **9 AM:**
 - Your team: Merge PR adding a new Kafka topic (perfectly valid)
-- Team X: Merge PR with incorrect schema registry reference
+- Team X: Merge PR with incorrect Kafka ACL configuration
 
 **10 AM** - Scheduled deployment fails ❌ on Team X error
 
