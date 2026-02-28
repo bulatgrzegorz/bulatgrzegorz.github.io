@@ -11,7 +11,6 @@ permalink: /about/
 
 # About
 
-Software developer, programming enthusiast. Proud father of greatest daughter in the world. I have over 8 years of professional experience, mostly in financial and vindication domain, building widely understood back-end systems.
+Software developer, programming enthusiast. Proud father of greatest daughter in the world. I have over 10 years of professional experience, mostly in financial and vindication domain, building widely understood back-end systems.
 
-Love simplicity and self explanatory code. I have a lot of fun building tools and libraries for developers. 
-
+Love simplicity and self explanatory code. I have a lot of fun building tools and libraries for developers.
