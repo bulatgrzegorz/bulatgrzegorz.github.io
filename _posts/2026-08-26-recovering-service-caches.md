@@ -1,5 +1,5 @@
 ---
-date: 2026-08-27 11:48:00
+date: 2026-08-26 11:48:00
 layout: post
 title: "Cache readiness and rehydration models"
 subtitle: "Rebuilding a service cache from Kafka"
