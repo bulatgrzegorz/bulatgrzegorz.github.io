@@ -22,6 +22,8 @@ paginate: false
 
 # A fresh replica, ready from request #1
 
+![restart](/assets/img/posts/cacherehydration/restarting.jpg)
+
 You push a new version of your service. Kubernetes does what it always does: starts a fresh pod, waits for it to report healthy, push traffic over, and retires the old ones. Routine stuff.
 
 The catch is that your service keeps its entire product catalog in memory. Every replica holds the complete cache and answers queries straight from memory — no database calls. Great for latency, but a fresh process starts with an *empty* cache. And the rest of the system didn't pause while this replica was booting: products were created, updated, and deleted the whole time.
@@ -32,20 +34,22 @@ This post walks through two ways to do that rehydration, using a small .NET 10 e
 
 # What recovery must guarantee
 
-Before comparing approaches, let's pin down what "the cache is correct" actually means. It's tempting to hand-wave this as "load all the products", but recovery runs *while the system is live*, and that's where the sharp edges are. A recovery protocol is only correct if it holds these guarantees:
+Before comparing approaches, let's pin down what "the cache is correct" actually means. It's tempting to just "load all the products", but recovery runs *while the system is live*, and that's where the sharp edges are. A recovery protocol is only correct if it holds these guarantees:
 
 - **Ordering per product.** Records for a single product are applied in correct order. If a price went `100 → 90`, the cache must never settle on `100`.
 - **Duplicates are harmless.** At-least-once delivery is a fact of life. Seeing the same record twice must leave the cache in the same state as seeing it once.
 - **No resurrected deletes.** Once a product is deleted, an older record for it that shows up later during replay must not bring it back from the dead.
 - **No queries until ready.** Until recovery reaches its target on every partition, the replica must refuse to answer product queries — a `503`, not a wrong answer.
 
-That last point is the one people skip, and it's why the readiness probe matters so much. A replica that answers queries early isn't "eventually consistent" — it's *wrong*, and it's wrong silently.
+That last point is the one systems often skip, and it's why the readiness probe matters so much. A replica that answers queries early isn't "eventually consistent" — it's *wrong*, and it's wrong silently.
 
 Both recovery models we'll look at have to satisfy every one of them; the difference is *how much machinery* each needs to get there.
 
 # The example service
 
-The example is a product catalog service. It's covered by [functional tests](https://bulatgrzegorz.github.io/complete-guide-to-functional-tests/) against actual Kafka and PostgreSQL containers. <!-- TODO: add repo link once pushed to GitHub -->
+The example is a product catalog service. It's covered by [functional tests](https://bulatgrzegorz.github.io/complete-guide-to-functional-tests/) against actual Kafka and PostgreSQL containers.
+
+Example code: [service-cache-recovery](https://github.com/bulatgrzegorz/service-cache-recovery)
 
 Service exposes API:
 
@@ -58,9 +62,9 @@ GET    /recovery
 GET    /health/ready
 ```
 
-To make things more interesting, service does follows `listen to yourself` pattern, which pros and cons will not be explain in greater details here - more about it [here - Derek Comartin](https://youtu.be/cuQ9zuNF1cI?si=Ca8WX_MysqWgC3sX) and [here - Confluent](https://youtu.be/If2W6tmDn80?si=MFaJ4xgUcrdy9te4).
+To make things more interesting, service does follows `listen to yourself` pattern, which pros and cons will not be explain here - more about it [here - Derek Comartin](https://youtu.be/cuQ9zuNF1cI?si=Ca8WX_MysqWgC3sX) and [here - Confluent](https://youtu.be/If2W6tmDn80?si=MFaJ4xgUcrdy9te4).
 
-Long story short: **writes don't touch the cache directly.** A `PUT` publishes the complete product state to Kafka and returns `202 Accepted` the moment Kafka acknowledges it. A `DELETE` publishes a tombstone. The endpoint doesn't update in-memory state, and it doesn't write to PostgreSQL:
+Long story short: **writes don't touch the cache and database directly.** A `PUT` publishes the complete product state to Kafka and returns `202 Accepted` the moment Kafka acknowledges it. A `DELETE` publishes a tombstone. The endpoint doesn't update in-memory state, and it doesn't write to PostgreSQL:
 
 ```csharp
 app.MapPut("/products/{id:guid}", async (Guid id, ProductInput input, ProductEventProducer producer) =>
@@ -71,7 +75,7 @@ app.MapPut("/products/{id:guid}", async (Guid id, ProductInput input, ProductEve
 });
 ```
 
-The service publishes an event and then consumes its own event to update its state, exactly the same way it would consume an event produced by anyone else. The trade-off is that reads are eventually consistent — right after a `PUT`, your own `GET` might not see it yet. We accept that here.
+The service publishes an event and then consumes it to update its state, exactly the same way it would consume an event produced by anyone else. The trade-off is that reads are eventually consistent — right after a `PUT`, your own `GET` might not see it yet. We accept that here.
 
 ## One log, two consumers
 
@@ -89,8 +93,6 @@ The local cache consumer is the odd one. It does **not** use group balancing, be
 So the cache consumer manually assigns *every* partition to *itself*, in every replica. This is why we can't just lean on Kafka's consumer group to do recovery for us — the tool that normally divides work is exactly the tool we're refusing to use here.
 
 ## Compacted product records
-
-![log-compaction](/assets/img/posts/cacherehydration/compressing.png)
 
 The `products` topic is [**log-compacted**](https://docs.confluent.io/kafka/design/log_compaction.html) and uses the product ID as the key. Compaction means Kafka eventually keeps only the latest record per key, which keeps the log from growing while still letting a new consumer rebuild full state easier from offset zero.
 
@@ -123,9 +125,11 @@ Concretely, the cache consumer does this:
 5. **Become ready** once every partition's position reaches its captured watermark.
 6. **Keep going.** Every worker continues with the same consumer it used during recovery.
 
-The whole thing is one small worker per partition. Each worker replays its partition and then, without reassigning or seeking, continues into live traffic. Partitions recover in parallel, and a slow partition doesn't block the others from reaching their own live loops.
+The whole thing is one small worker per partition. Each worker replays its partition and then, without reassigning or seeking, continues into live traffic.
 
 ## A compacted topic is not a snapshot
+
+![log-compaction](/assets/img/posts/cacherehydration/compaction.png)
 
 It's tempting to think a compacted topic is just "one record per key". It isn't, and two details bite if you assume otherwise.
 
@@ -196,7 +200,7 @@ Plan is simple:
 1. Load all products from PostgreSQL
 2. Start consuming Kafka from "now"
 
-Fast, cheap, one big query and you're live. It's also broken, and the way it breaks is subtle enough that it'll pass every test you write on your laptop.
+Fast, cheap, one big query and you're live. It's also broken, and the way it breaks is subtle enough that it's hard to discover.
 
 Here's the timeline. The cache consumer and the projector are independent — they read Kafka at their own pace. Watch what happens when they interleave badly:
 
@@ -215,7 +219,7 @@ It still can — because you've fixed the wrong gap. The window that matters isn
 
 ![naive race](/assets/img/posts/cacherehydration/database-snapshot-race-2.png)
 
-Offset 11 is in neither place: too late for the snapshot, too early for your subscription. It's gone. Subscribing first bought you nothing, because the boundary you needed to align with was the projector's position, not the clock.
+Offset 11 is in neither place: too late for the snapshot, too early for your subscription (you read offset 12 from kafka and offset 10 from database). It's gone. Subscribing first bought you nothing, because the boundary you needed to align with was the projector's position, not the clock.
 
 You could dodge this by subscribing from the very beginning of the log — but then you're replaying everything, which is just Model 1 with extra steps. The only way to make "subscribe first" correct and cheap is to know the snapshot's exact offset per partition. Which is precisely the thing we're about to build.
 
@@ -225,7 +229,7 @@ This single race is why this whole post exists. Both recovery models are really 
 
 But we saw where "just load the database and start Kafka from now" leads: silent, permanent staleness. So the entire trick of this model is replacing that fuzzy "now" with an **exact, verifiable starting offset per partition**. That mechanism is the one coined term in this whole post: the **drain marker**.
 
-Quick recap, because it's the thing the drain marker exists to fix. The snapshot was built by the projector reading Kafka up to *some* position. When you then start the cache consumer "from now", you have no idea how that "now" relates to the position the snapshot reflects. If the projector was lagging, records it hadn't gotten to yet are neither in the snapshot *nor* after your start offset. They vanish.
+The snapshot was built by the projector reading Kafka up to *some* position. When you then start the cache consumer "from now", you have no idea how that "now" relates to the position the snapshot reflects. If the projector was lagging, records it hadn't gotten to yet are neither in the snapshot *nor* after your start offset. They vanish.
 
 To load a snapshot safely, you need to answer one question precisely: **exactly which Kafka offset does this snapshot correspond to, on each partition?** Then you start replay from *there*, not from "now".
 
@@ -233,7 +237,7 @@ To load a snapshot safely, you need to answer one question precisely: **exactly 
 
 Here's the move. Before loading the snapshot, the recovering cache writes a special record — a **drain marker** — directly to *every* partition of the `products` topic. Then it waits until it can see, that the projector has processed each of those markers.
 
-Why does that work? The projector consumes each partition in order, one record at a time, committing to PostgreSQL as it goes. So when a marker appears in PostgreSQL, it's *proof* that every record before it on that partition has already been committed to the projection. The marker "drains" the pipeline up to that point — hence the name.
+Why does that work? The projector consumes each partition in order, one record at a time, committing to PostgreSQL as it goes. So when a marker is processed, it's *proof* that every record before it on that partition has already been committed to the projection. The marker "drains" the pipeline up to that point — hence the name.
 
 That gives us the exact offset we were missing. For each partition, the marker's offset is the boundary: everything at or before it is guaranteed to be in the snapshot; everything after it is what we need to replay.
 
@@ -265,37 +269,13 @@ As we do not want to overwrite snapshot data with already stale messages, the gu
 Here's the actual apply method:
 
 ```csharp
-if (products.TryGetValue(productId, out var current))
+if (current.SourcePartition != record.Partition.Value)
 {
-    if (current.SourcePartition != record.Partition.Value)
-    {
-        throw new InvalidOperationException(
-            $"Product {productId} moved from partition {current.SourcePartition} " +
-            $"to {record.Partition.Value}. Offset versions are no longer comparable.");
-    }
-
-    if (current.SourceOffset >= record.Offset.Value)
-    {
-        return CacheApplyResult.SkippedAsOlder;
-    }
+    throw new InvalidOperationException(
+        $"Product {productId} moved from partition {current.SourcePartition} " +
+        $"to {record.Partition.Value}. Offset versions are no longer comparable.");
 }
 
-if (record.Message.Value is null)
-{
-    products[productId] = new CachedProduct(null, IsDeleted: true, record.Partition.Value, record.Offset.Value);
-
-    return CacheApplyResult.TombstoneApplied;
-}
-
-var product = ProductRecord.DeserializeProduct(record.Message.Value);
-products[productId] = new CachedProduct(product, IsDeleted: false, record.Partition.Value, record.Offset.Value);
-
-return CacheApplyResult.Applied;
-```
-
-The heart of it is these three lines:
-
-```csharp
 if (current.SourceOffset >= record.Offset.Value)
 {
     return CacheApplyResult.SkippedAsOlder;
@@ -306,14 +286,9 @@ If the cache already holds this product at an offset equal to or newer than the 
 
 Two supporting details fall out of the same design. Tombstones keep their offset too — a deleted product stays in the cache as a deletion marker with its `source_offset`, so an older "product exists" record can't resurrect it (that's the *no resurrected deletes* guarantee, enforced by the exact same comparison). And if a product ever shows up on a *different* partition than the cache recorded, we throw — offsets across partitions aren't comparable, and that situation means someone repartitioned the topic, which this model deliberately doesn't support.
 
-The one thing I'm *not* showing here is how markers get persisted on the projector side — the `recovery_markers` table, the upsert, the transaction that commits a product and its checkpoint together. It's necessary for the mechanism but it's mechanical; it lives in the example repo.
-
 # Comparing the recovery models
 
-![architecture](/assets/img/posts/recovering-service-caches/architecture.png)
-<!-- TODO: excalidraw — system architecture: API replica, local cache, Kafka, PostgreSQL projection. -->
-
-Both models end at the same place — a complete, correct cache that transitions cleanly into live consumption. What differs is everything *around* that. I'll keep this qualitative on purpose; the example repo has a seeding scenario that measures real numbers for 100k and 1M products, but numbers depend so heavily on your log size, hardware, and partition count that quoting them here would be misleading.
+Both models end at the same place — a complete, correct cache that transitions cleanly into live consumption. What differs is everything *around* that.
 
 | Dimension | Kafka replay | Database snapshot |
 | --- | --- | --- |
@@ -340,11 +315,9 @@ Start with Kafka replay. It's the default, and it should stay the default until 
 
 Reach for the database snapshot only when a concrete pressure pushes you there:
 
-- **Your retained log is large.** If replaying the full history takes minutes and you're spinning replicas up and down often, that cost compounds. A snapshot turns "read everything" into "read one query plus a small overlap".
+- **Your retained log is large.** If replaying the full history takes minutes and you're spinning replicas up and down often, that cost compounds.
 - **You have a strict startup-time SLA.** If a new replica *must* be serving traffic within some tight budget, and replay can't reliably hit it, the snapshot buys you a faster start.
 - **Kafka is the constrained resource.** If your brokers are already hot and you can't afford every replica re-reading the whole log, moving that load to PostgreSQL may be the pragmatic trade.
-
-And here's the important part: **if those pressures do push you to the snapshot, you have to implement it *correctly* — which means the drain marker and the overlap guard, not "load the database and start from now".** The naive version isn't a simpler snapshot; it's a broken one. The moment you choose a snapshot, you've signed up for the full coordination protocol. There's no cheap middle ground.
 
 # Wrapping up
 
