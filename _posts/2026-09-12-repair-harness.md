@@ -23,19 +23,19 @@ paginate: false
 
 # Wake up call
 
-You wake up to worst sound there is, pager duty ring tone. Before your brain registered what really happen, your hearth already beating as crazy. It get's to you quite quickly - that will not be a peaceful night.
+You wake up to the worst sound there is, the pager duty ringtone. Before your brain registers what's really happening, your heart is already beating like crazy. It hits you quite quickly — this will not be a peaceful night.
 
-You get to the desk with effort, open laptop lid, monitor is the only thing that lighten up dark room. Login, get to the alert, get to the dashboard.
+You get to the desk with effort, open the laptop lid, and the monitor is the only thing that lights up the dark room. Log in, get to the alert, get to the dashboard.
 
-You may know this story once to many, if you don't - praise it, systems do break, and when they do, you not only what to fix the issue, you just want to crawl back under the cozy covers.
+You may know this story all too well. If you don't, count yourself lucky. Systems do break, and when they do, you not only want to fix the issue, but also want to crawl back under the cozy covers.
 
 ![pagerduty](/assets/img/posts/incidentharness/pagerdutynight.png)
 
 # Investigation routine
 
-As usual that might be anything, requests in legacy service started to fail all the sudden, website started to be unresponsive, number of failed kafka messages triggered an alert, you name it.
+As usual, it might be anything: requests in a legacy service suddenly started failing, the website became unresponsive, or the number of failed Kafka messages triggered an alert. You name it.
 
-So you start tracking it down, getting from one dashboard to another, checking logs, putting the puzzle to whole.
+So you start tracking it down, getting from one dashboard to another, checking logs, putting the puzzle together.
 
 The routine is always similar. First you need to prove that the alert is real. Then you search for the affected service, follow traces and logs, check what changed, inspect the data that triggered the failure, and build a hypothesis. Only after that can you touch the code. Even then, fixing the exception is not enough. You still need to prove that the service recovered, that no data was lost, and that the same message will not block the system again.
 
@@ -71,9 +71,9 @@ But if you took away the good parts, you should definitely take away the bad one
 
 # Investigation harness
 
-Getting back to investigation. Wouldn't that be nice, if LLM already give it a try to investigate the issue and even to fix it before your attendance is absolutely necessary? 
+Getting back to the investigation. Wouldn't it be nice if an LLM had already tried to investigate the issue and even fix it before your involvement is absolutely necessary?
 
-Exactly that proof of concept is main topic of that post. We will implement harness for LLM, that as soon as it discover the issue, it will orchestrate whole fixing operation and prepare decent information what happen and how system dealt with it.
+That proof of concept is the main topic of this post. We will implement a harness for an LLM that, as soon as it discovers an issue, orchestrates the whole repair operation and prepares useful information about what happened and how the system dealt with it.
 
 ## Architecture
 
@@ -88,7 +88,7 @@ flowchart LR
     A --> H
 ```
 
-Our worker is simple example process that's subscribe to kafka topic and do process product messages on it. Each product is persisted on disk. It does publish telemetry about it's actions, which finally lands on grafana.
+Our worker is a simple example process that subscribes to a Kafka topic and processes product messages from it. Each product is persisted on disk. It publishes telemetry about its actions, which finally lands in Grafana.
 
 The worker publishes counters for successfully processed, rejected, and failed records. It also reports its heartbeat, the timestamp of the last success, the committed-next offset, the partition log-end offset, consumer lag, and the timestamp of the last successful broker observation.
 
@@ -112,22 +112,23 @@ The harness is our repair orchestrator. When the detection rule matches, it star
 
 # What are we trying to prove?
 
-Question is, do we already have the technology that we can relay on, that will diagnose and repair active incidents (at least of some kind), providing evidence, deployment, final verdicts - and all of it, with reasonably cheap models. 
+The question is: do we already have technology we can rely on to diagnose and repair active incidents (at least some kinds), providing evidence, deployment and final verdicts — all with reasonably cheap models?
 
-That post it's not about installing some ready-to-go boxes of datadog, sentry, or whatever that might already be proposing those - it's about learning by doing and preparing proof that we can implement that by ourselves and observe results of it.
+This post is not about installing some ready-to-go boxes from Datadog, Sentry, or whatever might already offer this — it's about learning by doing and proving that we can implement this ourselves and observe the results.
 
-Am well aware (am maintaining systems of various sizes for more then decade) that most dangerous bugs are not usually simply code edge case, but some unrelated (at first glance at least) connotations, but we need to starting point (reader may treat evolution of that harness as homework 😅).
+I'm well aware (I've been maintaining systems of various sizes for more than a decade) that the most dangerous bugs are usually not simple code edge cases, but interactions between things that seem unrelated at first glance. Still, we need a starting point (the reader may treat the evolution of this harness as homework 😅).
 
-We will deal with narrow, small harness that hopefully with enough context and guardrails will successfully fix end-to-end easy code bug.
+We will work with a small, narrow harness that, hopefully, with enough context and guardrails, will successfully fix a simple code bug end to end.
 
 # The controlled incident
 
 ![pagerduty](/assets/img/posts/incidentharness/incident.png)
 
-During experiment three messages will be published:
+During the experiment, three messages will be published:
 
 ### First
-First is a valid baseline product - we will wait until it's persisted and committed, which will prove that our experiment setup works as expected. 
+
+The first is a valid baseline product — we will wait until it's persisted and committed, which will prove that our experiment setup works as expected.
 
 ```json
 {
@@ -139,7 +140,7 @@ First is a valid baseline product - we will wait until it's persisted and commit
 
 ### Second
 
-Then, poison payload with empty `product type`:
+Then, a poison payload with `productType` set to `null`:
 
 ```json
 {
@@ -149,7 +150,7 @@ Then, poison payload with empty `product type`:
 }
 ```
 
-On effect of which handing code:
+The code handling this payload looks like this:
 
 ```csharp
 string? productType = root.TryGetProperty("productType", out var typeElement)
@@ -159,13 +160,13 @@ string? productType = root.TryGetProperty("productType", out var typeElement)
 var normalizedType = productType!.Trim().ToLowerInvariant();
 ```
 
-throws `NullReferenceException` unexpectedly while trying to normalize the type. It happens before worker is able to persist record and/or commit the kafka offset. 
+It throws a `NullReferenceException` unexpectedly while trying to normalize the type. It happens before the worker can persist the record or commit the Kafka offset.
 
-Bug isn't the hardest one (however am pretty sure all of us saw this kind of them already as well) - but the experiment isn't about solving hardest puzzles, rather to proof repair loop working.
+The bug isn't the hardest one (although I'm pretty sure we've all seen this kind of bug before) — but the experiment isn't about solving the hardest puzzles; it's about proving that the repair loop works.
 
 ### Third
 
-Then, just after poison one, valid product message is published. That tail message is important - it becomes a litmus test. Because of bug in code, our worker is stuck on poison message and cannot reach tail.
+Then, just after the poison record, a valid product message is published. That tail message is important — it becomes a litmus test. Because of the bug in the code, our worker is stuck on the poison message and cannot reach the tail.
 
 ```json
 {
@@ -179,10 +180,11 @@ Then, just after poison one, valid product message is published. That tail messa
 
 ![pagerduty](/assets/img/posts/incidentharness/onandoff.gif)
 
-Just for proof that harness was written by humans - we will start with what typically we (IT guys) would recommend as first hand advice - as soon as we discover ongoing problem, we will restart the worker and check again. Of course that will not fix this specific problem - but, it always worth a shot, right?
+Just to prove that the harness was written by humans, we will start with what we (IT guys) typically recommend as the first piece of advice: as soon as we discover an ongoing problem, we will restart the worker and check again. Of course, that will not fix this specific problem — but it's always worth a shot, right?
 
 ---
-Finally, the diagram that's summarize this paragraph in on shot. Worker is well and alive, then failures are keep increasing, while successes are not. Our process is stuck in place.
+
+Finally, here's a diagram that summarizes this section in one shot. The worker is alive and well, but failures keep increasing while successes do not. Our process is stuck in place.
 
 ```mermaid
 sequenceDiagram
@@ -216,6 +218,7 @@ For this experiment, Grafana evaluates a simple rule:
 
 - The worker instance has reported at least three processing failures.
 - Consumer lag is positive.
+- That instance hasn't reported any successful processing.
 
 The harness waits for this alert through Grafana's API. Together with the restart check from the previous section, we now have a worker that keeps failing, pending work it cannot reach, and proof that turning it off and on didn't help. Time to try something slightly more sophisticated 😂.
 
@@ -336,7 +339,7 @@ flowchart LR
     C --> G[Must pass]
 ```
 
-With the original processor, the new scenario gets stuck behind the malformed record. With the repaired processor, the rejection is persisted and the next product gets processed.
+With the original processor, the new scenario gets stuck on the malformed record. With the repaired processor, the rejection is persisted and the committed offset advances.
 
 The current red check is fairly simple: a nonzero test-process exit and `NullReferenceException` in its log. It gives us evidence that the regression reaches the original failure, though it isn't a sophisticated inspection of individual test results.
 
