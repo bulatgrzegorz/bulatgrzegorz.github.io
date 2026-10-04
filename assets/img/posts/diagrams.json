@@ -1,0 +1,163 @@
+[
+  {
+    "svg": "contextpropagation/activity_trace.svg",
+    "source": "contextpropagation/activity_trace.excalidraw",
+    "original": "contextpropagation/activity_trace.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "contextpropagation/activity_id.svg",
+    "source": "contextpropagation/activity_id.excalidraw",
+    "original": "contextpropagation/activity_id.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "snapshot/architecture.svg",
+    "source": "snapshot/architecture.excalidraw",
+    "original": "snapshot/architecture.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "rebac/hierarchy.svg",
+    "source": "rebac/hierarchy.excalidraw",
+    "original": "rebac/hierarchy.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "rebac/hierarchy-account-groups.svg",
+    "source": "rebac/hierarchy-account-groups.excalidraw",
+    "original": "rebac/hierarchy-account-groups.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "rebac/tuple.svg",
+    "source": "rebac/tuple.excalidraw",
+    "original": "rebac/tuple.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "rebac/tuple-2.svg",
+    "source": "rebac/tuple-2.excalidraw",
+    "original": "rebac/tuple-2.png",
+    "recovered": true,
+    "animated": false
+  },
+  {
+    "svg": "breakingchanges/high-level-lib-diagram.svg",
+    "source": "breakingchanges/high-level-lib-diagram.excalidraw",
+    "original": "breakingchanges/high-level-lib-diagram.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "breakingchanges/low-level-lib-diagram.svg",
+    "source": "breakingchanges/low-level-lib-diagram.excalidraw",
+    "original": "breakingchanges/low-level-lib-diagram.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "broadcastrequest/architecture.svg",
+    "source": "broadcastrequest/architecture.excalidraw",
+    "original": "broadcastrequest/architecture.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "contextpropagation/system_graph.svg",
+    "source": "contextpropagation/system_graph.excalidraw",
+    "original": "contextpropagation/system_graph.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "functionaltests/wiremock-conflict.svg",
+    "source": "functionaltests/wiremock-conflict.excalidraw",
+    "original": "functionaltests/wiremock-conflict.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "functionaltests/wiremock-traceid.svg",
+    "source": "functionaltests/wiremock-traceid.excalidraw",
+    "original": "functionaltests/wiremock-traceid.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "functionaltests/context-propagation.svg",
+    "source": "functionaltests/context-propagation.excalidraw",
+    "original": "functionaltests/context-propagation.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/log-compaction.svg",
+    "source": "cacherehydration/log-compaction.excalidraw",
+    "original": "cacherehydration/log-compaction.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/consuming-partition.svg",
+    "source": "cacherehydration/consuming-partition.excalidraw",
+    "original": "cacherehydration/consuming-partition.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/partition-status.svg",
+    "source": "cacherehydration/partition-status.excalidraw",
+    "original": "cacherehydration/partition-status.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/database-snapshot-race.svg",
+    "source": "cacherehydration/database-snapshot-race.excalidraw",
+    "original": "cacherehydration/database-snapshot-race.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/database-snapshot-race-2.svg",
+    "source": "cacherehydration/database-snapshot-race-2.excalidraw",
+    "original": "cacherehydration/database-snapshot-race-2.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/drain-marker.svg",
+    "source": "cacherehydration/drain-marker.excalidraw",
+    "original": "cacherehydration/drain-marker.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "cacherehydration/overlap.svg",
+    "source": "cacherehydration/overlap.excalidraw",
+    "original": "cacherehydration/overlap.png",
+    "recovered": false,
+    "animated": false
+  },
+  {
+    "svg": "bodyreader/pipe_full_forward.svg",
+    "source": "bodyreader/pipe_full_forward.excalidraw",
+    "original": "bodyreader/pipe_full_forward.gif",
+    "recovered": false,
+    "animated": true
+  },
+  {
+    "svg": "bodyreader/pipe_messages_incremental.svg",
+    "source": "bodyreader/pipe_messages_incremental.excalidraw",
+    "original": "bodyreader/pipe_messages_incremental.gif",
+    "recovered": false,
+    "animated": true
+  }
+]

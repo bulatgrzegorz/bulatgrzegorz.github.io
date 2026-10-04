@@ -23,7 +23,7 @@ paginate: false
 
 Picture this: Some time ago I had situation in which I had to test service that aggregated data from dozens of endpoints in multiple services (please don't judge me, life is not always like we would like it to be 😭). It looked something like:
 
-![arch1](/assets/img/posts/snapshot/architecture.png)
+![arch1](/assets/img/posts/snapshot/architecture.svg)
 
 Implementation is one thing, but then you are going to face another wall - how to integrate test it, without spending years on mocking data for each case and each service call.
 

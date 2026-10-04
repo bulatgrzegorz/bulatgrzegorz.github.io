@@ -26,7 +26,7 @@ While building software systems sooner or later you will come across communicati
 It could be front-end calling back-end, it could be communication in distributed microservice architecture deployed over huge cluster.
 Nevertheless we will end up with executions that are being handled by separate processes - and finally we would probably like to correlate them in order to investigate some problems, analyze performance bottlenecks or just read logs from those separate processes joint together.
 
-![system](/assets/img/posts/contextpropagation/system_graph.png)
+![system](/assets/img/posts/contextpropagation/system_graph.svg)
 
 In past there we had multiple libraries, code circulate on stackoverflow that was supposed to handle those correlations for us. Problem, as usually was with such local solutions - no standardization.
 
@@ -47,7 +47,7 @@ First, lets understand few constructs that we are going to be using.
 
 In .NET Activity is a representation of unit of work in trace. While whole trace is represented by tree of activities. Each activity could potentially took place in different processes. Other common name for such constructs you can find is "Span" - for example used in OpenTelemetry.  
 
-![system](/assets/img/posts/contextpropagation/activity_trace.png)
+![system](/assets/img/posts/contextpropagation/activity_trace.svg)
 
 Tree structure as shown above allowing us to track sub operations of root action and investigate them individually.
 Activities contains information about operation name, identifiers, start time, duration, tags, events, baggage and others.
@@ -57,7 +57,7 @@ Activities contains information about operation name, identifiers, start time, d
 To be able to build trace hierarchy, each activity records trace id, its own span id and parent span id. Trace id is an unchanging value for whole lifetime of trace, it is being generated as root level, and being passed to each span.
 Span id is being generated for each new Activity and it is identifying it uniquely. Parent span id is just span id of parent activity (in context of tree).
 
-![system](/assets/img/posts/contextpropagation/activity_id.png)
+![system](/assets/img/posts/contextpropagation/activity_id.svg)
 
 > Note: Above description is describing W3C standard of trace identifiers [TraceContext](https://www.w3.org/TR/trace-context/). It is being default scheme in .NET staring from version 5. Before that - "Hierarchical" scheme was used, that is not going to be described here. 
 

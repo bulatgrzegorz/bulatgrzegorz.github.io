@@ -96,7 +96,7 @@ So the cache consumer manually assigns *every* partition to *itself*, in every r
 
 The `products` topic is [**log-compacted**](https://docs.confluent.io/kafka/design/log_compaction.html) and uses the product ID as the key. Compaction means Kafka eventually keeps only the latest record per key, which keeps the log from growing while still letting a new consumer rebuild full state easier from offset zero.
 
-![log-compaction](/assets/img/posts/cacherehydration/log-compaction.png)
+![log-compaction](/assets/img/posts/cacherehydration/log-compaction.svg)
 
 That design choice forces another one: **every product record carries complete state**, not a delta.
 
@@ -162,7 +162,7 @@ while (true)
 
 That's the complete lifecycle of one partition: hydrate to the captured target, report ready, then keep consuming live records with the same consumer. If `Start == Target`, the first loop is skipped, so an empty partition becomes ready immediately.
 
-![log-compaction](/assets/img/posts/cacherehydration/consuming-partition.png)
+![log-compaction](/assets/img/posts/cacherehydration/consuming-partition.svg)
 
 `ProcessRecord` applies a normal record and returns `record.Offset.Value + 1`. When Kafka reports partition EOF, it returns the EOF offset instead. This is what carries the position across compaction gaps, including a compacted-away record just before the target.
 
@@ -179,7 +179,7 @@ public void PartitionReady(int partition)
 }
 ```
 
-![log-compaction](/assets/img/posts/cacherehydration/partition-status.png)
+![log-compaction](/assets/img/posts/cacherehydration/partition-status.svg)
 
 The readiness probe returns `503` until that final partition reports ready.
 
@@ -204,7 +204,7 @@ Fast, cheap, one big query and you're live. It's also broken, and the way it bre
 
 Here's the timeline. The cache consumer and the projector are independent — they read Kafka at their own pace. Watch what happens when they interleave badly:
 
-![naive race](/assets/img/posts/cacherehydration/database-snapshot-race.png)
+![naive race](/assets/img/posts/cacherehydration/database-snapshot-race.svg)
 
 Read it top to bottom. Cache hydration starts, it loads the product from PostgreSQL and gets price `100`. A beat later, the projector consumes the `price = 90` record and writes it to database — but the cache already did its read, so it never saw it. Then the cache starts consuming Kafka "from now", which is *after* the `90` record's offset. That record is now behind the starting line. Nobody will ever replay it into this cache.
 
@@ -217,7 +217,7 @@ The obvious fix is to flip the order: start consuming Kafka before you read the 
 
 It still can — because you've fixed the wrong gap. The window that matters isn't between **when you subscribe** and **when you read the database**. It's between **where the projector was when it built that snapshot** and **where you started consuming**. And the projector is a separate consumer reading at its own pace, so you have no idea where that is.
 
-![naive race](/assets/img/posts/cacherehydration/database-snapshot-race-2.png)
+![naive race](/assets/img/posts/cacherehydration/database-snapshot-race-2.svg)
 
 Offset 11 is in neither place: too late for the snapshot, too early for your subscription (you read offset 12 from kafka and offset 10 from database). It's gone. Subscribing first bought you nothing, because the boundary you needed to align with was the projector's position, not the clock.
 
@@ -241,7 +241,7 @@ Why does that work? The projector consumes each partition in order, one record a
 
 That gives us the exact offset we were missing. For each partition, the marker's offset is the boundary: everything at or before it is guaranteed to be in the snapshot; everything after it is what we need to replay.
 
-![drain marker](/assets/img/posts/cacherehydration/drain-marker.png)
+![drain marker](/assets/img/posts/cacherehydration/drain-marker.svg)
 
 
 A few things make this robust in practice:
@@ -260,7 +260,7 @@ There's one more wrinkle, and it's the reason the snapshot rows carry offset met
 
 The projector doesn't stop when it processes a marker — it keeps consuming. So between the moment the marker is persisted and the moment we actually run the snapshot query, the projector may have advanced *past* the marker and save newer state. Concretely:
 
-![overlap](/assets/img/posts/cacherehydration/overlap.png)
+![overlap](/assets/img/posts/cacherehydration/overlap.svg)
 
 Our boundary says "replay from offset 12" (`marker offset + 1`). But the snapshot we loaded *already contains* price `90` from offset `12`, because the projector got there first. 
 

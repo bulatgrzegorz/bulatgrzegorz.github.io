@@ -265,7 +265,7 @@ return isSuccessFromAllCalls ? Results.Ok(result) : Results.BadRequest(result);
 Full code can be found here: [k8s-request-broadcaster](https://github.com/bulatgrzegorz/k8s-request-broadcaster).
 
 Final architecute of solution would look like this:
-![architecture](/assets/img/posts/broadcastrequest/architecture.png)
+![architecture](/assets/img/posts/broadcastrequest/architecture.svg)
 
 * 1 - Client is making call to broadcaster, passing headless-service name, target port and target url address
 * 2 - Broadcaster using headless-service name is making DNS call in order to get destinations IP addresses

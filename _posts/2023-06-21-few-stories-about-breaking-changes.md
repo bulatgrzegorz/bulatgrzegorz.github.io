@@ -33,7 +33,7 @@ How much library changes can effect in breaking changes can differ in how it is 
 
 This kind of libraries are less sensitive to breaking changes - those libraries are being referenced directly in client’s application
 
-![dependency-diagram](/assets/img/posts/breakingchanges/high-level-lib-diagram.png)
+![dependency-diagram](/assets/img/posts/breakingchanges/high-level-lib-diagram.svg)
 
 Those are less sensitive, because even when breaking change was introduced, client can decide to change version of it or just modify application itself.
 
@@ -41,7 +41,7 @@ Those are less sensitive, because even when breaking change was introduced, clie
 
 Hardest in maintaining backward compatibility are low-level libraries, that are used as building blocks - in clients code or as part of other libraries (serializers, parsers, ...). It's different because such high-level libraries may be compiled against older version of library, where API was different. 
 
-![dependency-diagram](/assets/img/posts/breakingchanges/low-level-lib-diagram.png)
+![dependency-diagram](/assets/img/posts/breakingchanges/low-level-lib-diagram.svg)
 
 # Examples
 

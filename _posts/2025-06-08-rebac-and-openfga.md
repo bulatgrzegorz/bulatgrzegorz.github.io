@@ -41,7 +41,7 @@ Let's introduce folders (surprise huh?). Requirement is fairly simple, each docu
 
 That's makes it bit harder, now, we need to introduce some hierarchy calculations, which might be tricky to implement correctly (in relational databases [for example](https://learn.microsoft.com/en-us/sql/t-sql/queries/with-common-table-expression-transact-sql?view=sql-server-ver17)). Now, we not only just checking direct permissions, we need to investigate each parent object:
 
-![hierarchy](/assets/img/posts/rebac/hierarchy.png)
+![hierarchy](/assets/img/posts/rebac/hierarchy.svg)
 
 ## Account groups
 
@@ -49,7 +49,7 @@ Just when you thought you had it figured out with folders, account groups arrive
 check a permission, you have to answer: "Is the user a member of any group (or any parent
 group of that group) that has access to this document (or any of its parent folders)?":
 
-![hierarchy](/assets/img/posts/rebac/hierarchy-account-groups.png)
+![hierarchy](/assets/img/posts/rebac/hierarchy-account-groups.svg)
 
 You now have to traverse two hierarchies: the document's folder structure and the user's group memberships. This quickly becomes a performance bottleneck and a maintenance nightmare.
 
@@ -190,7 +190,7 @@ First, let's create a group called `hr-team` and add `user:anne` as a `member`:
 fga tuple write --store-id <store-id> user:anne member group:hr-team
 ```
 
-![hierarchy](/assets/img/posts/rebac/tuple.png)
+![hierarchy](/assets/img/posts/rebac/tuple.svg)
 ---
 
 Next, let's grant the members of `hr-team` group `reader` permissions on the `document:cv.pdf`:
@@ -199,7 +199,7 @@ Next, let's grant the members of `hr-team` group `reader` permissions on the `do
 fga tuple write --store-id <store-id> document:cv.pdf reader group:hr-team#member
 ```
 
-![hierarchy](/assets/img/posts/rebac/tuple-2.png)
+![hierarchy](/assets/img/posts/rebac/tuple-2.svg)
 
 Now, the moment of truth. Let's check if `user:anne` can read `document:cv.pdf`. We'll use the `fga check` command:
 

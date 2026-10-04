@@ -1,0 +1,16 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import config from "@/config";
+type Props = { tag: string; tagName: string; size?: "sm" | "lg" };
+const { tag, tagName } = Astro.props;
+---
+
+<li>
+  <a
+    class="tag-pill"
+    href={getRelativeLocaleUrl(
+      Astro.currentLocale ?? config.site.lang,
+      `tags/${tag}/`
+    )}>{tagName}</a
+  >
+</li>

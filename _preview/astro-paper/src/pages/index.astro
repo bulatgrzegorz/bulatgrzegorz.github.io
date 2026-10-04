@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getPostUrl } from "@/utils/getPostPaths";
+const posts = getSortedPosts(await getCollection("posts"));
+const [featured, ...recent] = posts;
+const featuredDate =
+  featured &&
+  new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(featured.data.pubDatetime);
+---
+
+<Layout>
+  <Header />
+  <main id="main-content" class="home-layout">
+    <section id="hero" class="home-hero">
+      <div>
+        <p class="eyebrow">Personal notes on software</p>
+        <h1>Hi, I’m Grzegorz.<br /><span>Learning as I go.</span></h1>
+        <p class="hero-intro">
+          I build software and write about what I learn along the way. Mostly C#
+          / .NET, distributed systems, testing, and the occasional rabbit hole.
+        </p>
+      </div>
+    </section>
+    {
+      featured && (
+        <section class="featured-section" aria-label="Latest article">
+          <a
+            class="featured-article"
+            href={getPostUrl(featured.id, featured.filePath)}
+          >
+            <div class="featured-image">
+              <img src={featured.data.image} alt="" fetchpriority="high" />
+            </div>
+            <div class="featured-copy">
+              <div class="featured-meta">
+                <>
+                  <span class="latest-label">
+                    <span aria-hidden="true" />
+                    Latest article
+                  </span>
+                  <time datetime={featured.data.pubDatetime.toISOString()}>
+                    {featuredDate}
+                  </time>
+                </>
+              </div>
+              <h2>{featured.data.title}</h2>
+              <p>{featured.data.subtitle || featured.data.description}</p>
+              <span class="featured-read">
+                Read article <span aria-hidden="true">↗</span>
+              </span>
+            </div>
+          </a>
+        </section>
+      )
+    }
+    <section class="writing-section" aria-labelledby="writing-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">From the notebook</p><h2 id="writing-heading">
+            More writing
+          </h2>
+        </div><a href="/posts/"
+          >All articles <span aria-hidden="true">→</span></a
+        >
+      </div>
+      <ul class="article-grid">
+        {recent.map(post => <Card {...post} />)}
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    if (document.querySelector(".home-layout"))
+      sessionStorage.setItem("backUrl", "/");
+  });
+</script>

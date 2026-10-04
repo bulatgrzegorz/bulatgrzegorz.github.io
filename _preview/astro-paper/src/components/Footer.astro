@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Socials from "./Socials.astro";
+import config from "@/config";
+type Props = { noMarginTop?: boolean } & HTMLAttributes<"footer">;
+const { noMarginTop: _, class: className, ...attrs } = Astro.props;
+---
+
+<footer class:list={["site-footer", className]} {...attrs}>
+  <div>
+    <span class="footer-name">{config.site.title}</span><p>
+      © {new Date().getFullYear()} · Keep coding.
+    </p>
+  </div>
+  <div class="footer-links"><a href="/feed.xml">RSS feed</a><Socials /></div>
+</footer>

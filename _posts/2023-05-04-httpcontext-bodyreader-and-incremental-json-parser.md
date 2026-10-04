@@ -62,7 +62,7 @@ while (true)
 
 Above code will read more data each time we `advance`, to point where pipe reader result is completed (all data were returned). 
 
-![visualization](/assets/img/posts/bodyreader/pipe_full_forward.gif)
+![visualization](/assets/img/posts/bodyreader/pipe_full_forward.svg)
 
 But above solution is no much different (in result) from gathering whole data using stream. What pipes allow us to do, is to consume data piece by piece - incrementally. 
 
@@ -98,7 +98,7 @@ Each call to `ParseMessage` will move buffer forward, setting `consumed` value a
 
 >Note `consumed` and `examined` aren't necessary same - end of message could have place earlier then end of given buffer slice that we examined.
 
-![visualization](/assets/img/posts/bodyreader/pipe_messages_incremental.gif)
+![visualization](/assets/img/posts/bodyreader/pipe_messages_incremental.svg)
 
 ## ReadAsync
 

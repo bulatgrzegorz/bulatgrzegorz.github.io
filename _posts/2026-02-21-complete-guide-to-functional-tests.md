@@ -164,7 +164,7 @@ Infrastructure starts once, the application boots with real dependencies, and ea
 
 But there is a catch when running tests in parallel. Because we share a single instance of WireMock and Kafka across all concurrent tests, the context becomes messy. If Test A and Test B both expect WireMock to return a specific response, or both publish a message to the same Kafka topic at the exact same time, they will step on each other's toes. Test A might accidentally consume Test B's message, or WireMock might return Test B's mock to Test A. 
 
-![wiremock-conflict](/assets/img/posts/functionaltests/wiremock-conflict.png)
+![wiremock-conflict](/assets/img/posts/functionaltests/wiremock-conflict.svg)
 
 Without careful isolation, our tests will become flaky. To solve this, we need a way to pass a unique context from our test and implement distribution of it all the way downstream.
 
@@ -173,7 +173,7 @@ Without careful isolation, our tests will become flaky. To solve this, we need a
 The solution is surprisingly elegant if you're already using OpenTelemetry — and you probably should be. The idea: **give each test its own trace, and let standard W3C trace propagation do the isolation for you**.
 
 If we start an `Activity` before each test, every request that test makes will carry a unique `traceparent` header — and that header flows all the way through to the WebApi to any outbound calls (WireMock, Kafka, etc.).
-![context-propagation](/assets/img/posts/functionaltests/context-propagation.png)
+![context-propagation](/assets/img/posts/functionaltests/context-propagation.svg)
 
 > If you want to dive deeper into how context propagation works in distributed systems and how OpenTelemetry handles it under the hood, I wrote a dedicated post about it: [Context propagation in distributed systems and cooperation with OpenTelemetry](https://bulatgrzegorz.github.io/context-propagation-in-distributed-systems-and-cooperation-with-opentelemetry/).
 
@@ -228,7 +228,7 @@ new MatcherModel()
 
 Now when Test A and Test B both set up a stub for `/inventory/SKU-001`, they don't collide. Test A's stub only matches requests carrying Test A's trace ID, and vice versa. The `traceparent` header acts as a natural isolation key — and we didn't have to invent any custom correlation mechanism.
 
-![wiremock-traceid](/assets/img/posts/functionaltests/wiremock-traceid.png)
+![wiremock-traceid](/assets/img/posts/functionaltests/wiremock-traceid.svg)
 
 **What's important** — this works when API propagates trace context on its outbound HTTP calls (that's what `AddHttpClientInstrumentation()` does). We're just piggybacking on standard OpenTelemetry behavior.
 

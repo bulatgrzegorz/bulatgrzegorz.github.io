@@ -6,3 +6,5 @@ package-json.lock
 _site
 node_modules
 _drafts
+
+!_preview/astro-paper/.gitignore
