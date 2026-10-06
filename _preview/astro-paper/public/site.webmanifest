@@ -1,0 +1,22 @@
+{
+  "name": "Grzegorz Bułat",
+  "short_name": "gb.",
+  "start_url": "./",
+  "display": "browser",
+  "background_color": "#0e131b",
+  "theme_color": "#0e131b",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 ---
 import IconSearch from "@/assets/icons/IconSearch.svg";
 import config from "@/config";
+import { getAssetPath } from "@/utils/withBase";
 const currentPath = Astro.url.pathname;
 ---
 
@@ -9,7 +10,13 @@ const currentPath = Astro.url.pathname;
 >
 <header class="site-header">
   <a class="site-brand" href="/" aria-label={`${config.site.title} — home`}>
-    <span class="brand-mark" aria-hidden="true">gb.</span>
+    <img
+      class="brand-mark"
+      src={getAssetPath("gb.svg")}
+      width="44"
+      height="44"
+      alt=""
+    />
     <span class="brand-name">Grzegorz Bułat<span>Software developer</span></span
     >
   </a>
