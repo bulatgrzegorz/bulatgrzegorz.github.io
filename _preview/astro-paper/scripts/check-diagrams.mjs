@@ -27,7 +27,10 @@ const luminance = color => {
 };
 let labels = 0;
 for (const diagram of diagrams) {
-  assert(content.includes(`/assets/img/posts/${diagram.svg}`));
+  assert(
+    content.includes(`/assets/img/posts/${diagram.svg}`),
+    `SVG diagram not referenced by any published post: ${diagram.svg}`
+  );
   assert(
     !content.includes(`/assets/img/posts/${diagram.original}`),
     `Old diagram still used: ${diagram.original}`
@@ -35,7 +38,6 @@ for (const diagram of diagrams) {
   const svg = await readFile(new URL(diagram.svg, assets), "utf8");
   const scene = JSON.parse(await readFile(new URL(diagram.source, assets)));
   assert.equal(scene.type, "excalidraw");
-  assert(svg.includes('fill="#151c27"'), `Missing dark canvas: ${diagram.svg}`);
   assert(svg.includes("data:font"), `Font is not embedded: ${diagram.svg}`);
   assert(!/<script\b|(?:href|url\()\s*["']?https?:/i.test(svg));
   if (diagram.animated) {
@@ -64,5 +66,5 @@ for (const diagram of diagrams) {
   }
 }
 process.stdout.write(
-  `Verified ${diagrams.length} SVG diagrams, editable sources, ${labels} readable labels, and two animations with reduced-motion support.\n`
+  `Verified ${diagrams.length} SVG diagrams, editable sources, ${labels} readable labels, and animation accessibility.\n`
 );

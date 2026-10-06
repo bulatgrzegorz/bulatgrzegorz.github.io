@@ -13,13 +13,13 @@ npm run dev
 
 Use Node.js 24, matching the deployment workflow. Open [localhost:4321](http://localhost:4321/). The build also generates the Pagefind search index.
 
-Posts are loaded directly from `_posts/`; front matter and prose are preserved. Diagram image references use the new SVG exports. Only dated post filenames are imported, so drafts and planning notes are excluded. Existing slug URLs, `/feed.xml`, `/about/`, and `/assets/img/` paths are preserved. Zone-less publication timestamps are interpreted as UTC, matching Jekyll's default.
+Posts are loaded directly from `_posts/`; front matter and prose are preserved. Diagram image references use SVG exports or original raster images. Only dated post filenames are imported, so drafts and planning notes are excluded. Existing slug URLs, `/feed.xml`, `/about/`, and `/assets/img/` paths are preserved. Zone-less publication timestamps are interpreted as UTC, matching Jekyll's default.
 
 The blog uses a fixed dark theme, with a featured article and all remaining posts shown as image cards. It includes GitHub dark code colors, Mermaid diagrams using the site's palette, and a collapsible table of contents including H1 sections. Article metadata and Cloudinary cover images are adapted in the loader and layout.
 
 ## Editing diagrams
 
-The 23 drawings in `assets/img/posts/diagrams.json` each have an editable `.excalidraw` source beside a self-contained SVG with embedded fonts and a dark canvas. Seven drawings were recovered from existing sources; the others were recreated. The two pipeline diagrams animate four stages and respect the reader's reduced-motion preference. Their sources group each stage separately.
+The drawings in `assets/img/posts/diagrams.json` each have an editable `.excalidraw` source beside a self-contained SVG with embedded fonts. The manifest lists SVGs currently used by published posts; backgrounds vary by illustration. Seven drawings were recovered from existing sources; the others were recreated. The full-forward pipeline diagram animates four stages and respects the reader's reduced-motion preference. The incremental pipeline diagram shows the stages statically. Their sources group each stage separately.
 
 Open a source in [Excalidraw](https://excalidraw.com/) to edit it. To regenerate the SVGs using the official local API, install the export tools outside the blog and run:
 
