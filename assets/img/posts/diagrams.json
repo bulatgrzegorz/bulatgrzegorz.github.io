@@ -70,13 +70,6 @@
     "animated": false
   },
   {
-    "svg": "contextpropagation/system_graph.svg",
-    "source": "contextpropagation/system_graph.excalidraw",
-    "original": "contextpropagation/system_graph.png",
-    "recovered": false,
-    "animated": false
-  },
-  {
     "svg": "functionaltests/wiremock-conflict.svg",
     "source": "functionaltests/wiremock-conflict.excalidraw",
     "original": "functionaltests/wiremock-conflict.png",
@@ -158,6 +151,6 @@
     "source": "bodyreader/pipe_messages_incremental.excalidraw",
     "original": "bodyreader/pipe_messages_incremental.gif",
     "recovered": false,
-    "animated": true
+    "animated": false
   }
 ]
