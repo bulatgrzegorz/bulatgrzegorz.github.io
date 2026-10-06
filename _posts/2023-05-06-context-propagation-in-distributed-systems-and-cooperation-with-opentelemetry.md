@@ -26,7 +26,7 @@ While building software systems sooner or later you will come across communicati
 It could be front-end calling back-end, it could be communication in distributed microservice architecture deployed over huge cluster.
 Nevertheless we will end up with executions that are being handled by separate processes - and finally we would probably like to correlate them in order to investigate some problems, analyze performance bottlenecks or just read logs from those separate processes joint together.
 
-![system](/assets/img/posts/contextpropagation/system_graph.svg)
+![system](/assets/img/posts/contextpropagation/system_graph.png)
 
 In past there we had multiple libraries, code circulate on stackoverflow that was supposed to handle those correlations for us. Problem, as usually was with such local solutions - no standardization.
 
