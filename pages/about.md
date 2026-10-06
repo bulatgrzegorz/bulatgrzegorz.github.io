@@ -11,7 +11,7 @@ permalink: /about/
 
 # About
 
-I'm a software developer and programming enthusiast, and the proud father of the greatest daughter in the world. I have over 10 years of professional experience, mostly in finance and debt collection, building a wide range of back-end systems.
+I'm a software developer and programming enthusiast, a lucky husband, and the proud father of the greatest daughter in the world. I have over 10 years of professional experience, mostly in finance and debt collection, building a wide range of back-end systems.
 
 I love simplicity and self-explanatory code. I have a lot of fun building tools and libraries for developers.
 
