@@ -1,11 +1,22 @@
 ---
-import { getEntry, render } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
-import Breadcrumb from "@/components/Breadcrumb.astro";
-import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
+import Socials from "@/components/Socials.astro";
 import config from "@/config";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getPostUrl } from "@/utils/getPostPaths";
+import {
+  domains,
+  education,
+  facts,
+  jobs,
+  languages,
+  projects,
+  skillGroups,
+  strengths,
+} from "@/data/resume";
 
 const about = await getEntry("pages", "about");
 
@@ -16,6 +27,16 @@ if (!about) {
 }
 
 const { Content } = await render(about);
+const posts = getSortedPosts(await getCollection("posts")).slice(0, 3);
+const year = (date: Date) => date.getUTCFullYear();
+
+const sections = [
+  { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "skills", label: "Skills" },
+  { id: "writing", label: "Writing" },
+];
 ---
 
 <Layout
@@ -26,11 +47,865 @@ const { Content } = await render(about);
 >
   <Header />
 
-  <Breadcrumb />
+  <main id="main-content" class="cv">
+    <aside class="cv-side">
+      <button
+        type="button"
+        class="cv-photo-btn"
+        aria-label="Enlarge photo"
+        aria-haspopup="dialog"
+      >
+        <img
+          class="cv-photo"
+          src="/assets/img/uploads/profile.jpg"
+          width="96"
+          height="96"
+          alt="Grzegorz Bułat"
+        />
+      </button>
+      <dialog class="cv-lightbox" aria-label="Photo of Grzegorz Bułat">
+        <img
+          src="/assets/img/uploads/profile.jpg"
+          width="2115"
+          height="2391"
+          alt="Grzegorz Bułat"
+        />
+      </dialog>
+      <h1 class="cv-name">Grzegorz Bułat</h1>
+      <p class="cv-role">Senior C# .NET Developer</p>
+      <p class="cv-tagline">
+        I build fast, distributed back-end systems for finance — and tools that
+        make developers’ lives easier.
+      </p>
 
-  <Main pageTitle={about.data.title} class="app-prose">
-    <Content />
-  </Main>
+      <ul class="cv-facts">
+        {
+          facts.map(f => (
+            <li>
+              <strong>{f.value}</strong>
+              <span>{f.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <nav class="cv-nav" aria-label="Page sections">
+        {
+          sections.map(s => (
+            <a href={`#${s.id}`} data-section={s.id}>
+              <span class="cv-nav-line" />
+              {s.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="cv-socials"><Socials /></div>
+    </aside>
+
+    <div class="cv-content">
+      <section id="about" class="cv-section" aria-label="About">
+        <h2 class="cv-heading">About</h2>
+        <div class="cv-prose"><Content /></div>
+        <ul class="cv-chips cv-domains" aria-label="Domain knowledge">
+          {domains.map(d => <li>{d}</li>)}
+        </ul>
+      </section>
+
+      <section id="experience" class="cv-section" aria-label="Experience">
+        <h2 class="cv-heading">Experience</h2>
+        <ol class="cv-list">
+          {
+            jobs.map((job, i) => (
+              <li class="cv-card">
+                <details open={i === 0}>
+                  <summary>
+                    <span class="cv-period">{job.period}</span>
+                    <span class="cv-main">
+                      <span class="cv-title">
+                        {job.logo && (
+                          <img
+                            class="cv-logo"
+                            src={job.logo}
+                            width="20"
+                            height="20"
+                            alt=""
+                          />
+                        )}
+                        <span>
+                          {job.role} ·{" "}
+                          {job.url ? (
+                            <a class="cv-org" href={job.url}>
+                              {job.company}
+                            </a>
+                          ) : (
+                            <span class="cv-org">{job.company}</span>
+                          )}
+                          <span class="cv-toggle" aria-hidden="true" />
+                        </span>
+                      </span>
+                      <span class="cv-headline">{job.headline}</span>
+                      {job.clients && (
+                        <span class="cv-clients">
+                          <span class="cv-clients-label">Worked on</span>
+                          {job.clients.map(c => (
+                            <a class="cv-client" href={c.url}>
+                              <img src={c.logo} width="16" height="16" alt="" />
+                              {c.name}
+                            </a>
+                          ))}
+                        </span>
+                      )}
+                      <span class="cv-chips cv-tags">
+                        {job.tags.map(t => (
+                          <span>{t}</span>
+                        ))}
+                      </span>
+                    </span>
+                  </summary>
+                  <div class="cv-details">
+                    {job.details.map(group => (
+                      <div class="cv-group">
+                        {group.title && (
+                          <p class="cv-group-title">
+                            {group.url ? (
+                              <a href={group.url}>{group.title} ↗</a>
+                            ) : (
+                              group.title
+                            )}
+                          </p>
+                        )}
+                        <ul>
+                          {group.items.map(d => (
+                            <li>{d}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              </li>
+            ))
+          }
+        </ol>
+        <h3 class="cv-heading cv-subheading">Education</h3>
+        <div class="cv-edu">
+          <span class="cv-period">{education.period}</span>
+          <p class="cv-title">
+            {education.field} · <span class="cv-org">{education.school}</span>
+          </p>
+        </div>
+      </section>
+
+      <section id="projects" class="cv-section" aria-label="Projects">
+        <h2 class="cv-heading">Projects</h2>
+        <ul class="cv-projects">
+          {
+            projects.map(p => (
+              <li class="cv-card cv-project">
+                <h3 class="cv-title">
+                  <a href={p.repo}>
+                    {p.name} <span aria-hidden="true">↗</span>
+                  </a>
+                </h3>
+                <p class="cv-headline">{p.headline}</p>
+                <details>
+                  <summary class="cv-more">More</summary>
+                  <p class="cv-details">{p.details}</p>
+                </details>
+                <div class="cv-project-foot">
+                  <span class="cv-chips cv-tags">
+                    {p.tags.map(t => (
+                      <span>{t}</span>
+                    ))}
+                  </span>
+                  {p.live && (
+                    <a class="cv-link" href={p.live.url}>
+                      {p.live.label} ↗
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="cv-link cv-all" href="https://github.com/bulatgrzegorz"
+          >More on GitHub →</a
+        >
+      </section>
+
+      <section id="skills" class="cv-section" aria-label="Skills">
+        <h2 class="cv-heading">Skills</h2>
+        <ul class="cv-strengths">
+          {
+            strengths.map(s => (
+              <li>
+                <strong>{s.title}</strong>
+                <span>{s.text}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <dl class="cv-skills">
+          {
+            skillGroups.map(g => (
+              <div>
+                <dt>{g.name}</dt>
+                <dd class="cv-chips">
+                  {g.items.map(item => (
+                    <span>{item}</span>
+                  ))}
+                </dd>
+              </div>
+            ))
+          }
+          <div>
+            <dt>Languages</dt>
+            <dd class="cv-chips">
+              {languages.map(l => <span>{l}</span>)}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="writing" class="cv-section" aria-label="Writing">
+        <h2 class="cv-heading">Latest writing</h2>
+        <ul class="cv-posts">
+          {
+            posts.map(post => (
+              <li>
+                <a href={getPostUrl(post.id, post.filePath)}>
+                  <span class="cv-period">{year(post.data.pubDatetime)}</span>
+                  <span class="cv-post-title">{post.data.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="cv-link cv-all" href="/posts/">All articles →</a>
+      </section>
+    </div>
+  </main>
 
   <Footer />
 </Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const links = document.querySelectorAll<HTMLAnchorElement>(
+      ".cv-nav a[data-section]"
+    );
+    if (!links.length) return;
+    const setActive = (id: string) =>
+      links.forEach(l =>
+        l.classList.toggle("active", l.dataset.section === id)
+      );
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries.find(e => e.isIntersecting);
+        if (visible) setActive(visible.target.id);
+      },
+      { rootMargin: "-30% 0px -60% 0px" }
+    );
+    document
+      .querySelectorAll(".cv-section")
+      .forEach(section => observer.observe(section));
+    document.addEventListener(
+      "astro:before-swap",
+      () => observer.disconnect(),
+      {
+        once: true,
+      }
+    );
+  });
+
+  // Photo lightbox: the enlarged photo grows out of the round thumbnail.
+  document.addEventListener("astro:page-load", () => {
+    const trigger = document.querySelector<HTMLButtonElement>(".cv-photo-btn");
+    const thumb = trigger?.querySelector("img");
+    const dialog = document.querySelector<HTMLDialogElement>(".cv-lightbox");
+    const image = dialog?.querySelector("img");
+    if (!trigger || !thumb || !dialog || !image) return;
+
+    const timing = { duration: 420, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" };
+    const reducedMotion = () =>
+      matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Keyframes mapping the full image onto the thumbnail's circle.
+    const morph = (): Keyframe[] => {
+      const from = thumb.getBoundingClientRect();
+      const to = image.getBoundingClientRect();
+      const side = Math.min(to.width, to.height);
+      const scale = from.width / side;
+      const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+      const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+      const insetY = (to.height - side) / 2;
+      const insetX = (to.width - side) / 2;
+      return [
+        {
+          transform: `translate(${dx}px, ${dy}px) scale(${scale})`,
+          clipPath: `inset(${insetY}px ${insetX}px round ${side / 2}px)`,
+        },
+        { transform: "none", clipPath: "inset(0px 0px round 20px)" },
+      ];
+    };
+    const backdrop: Keyframe[] = [
+      { backgroundColor: "rgb(8 11 16 / 0)", backdropFilter: "blur(0px)" },
+      { backgroundColor: "rgb(8 11 16 / 0.82)", backdropFilter: "blur(10px)" },
+    ];
+
+    let closing = false;
+    const open = () => {
+      dialog.showModal();
+      if (reducedMotion()) return;
+      thumb.style.visibility = "hidden";
+      dialog.animate(backdrop, timing);
+      image.animate(morph(), timing);
+    };
+    const close = async () => {
+      if (closing || !dialog.open) return;
+      closing = true;
+      if (!reducedMotion()) {
+        const reverse = {
+          ...timing,
+          duration: 340,
+          direction: "reverse" as const,
+        };
+        dialog.animate(backdrop, reverse);
+        await image.animate(morph(), reverse).finished;
+      }
+      dialog.close();
+      thumb.style.visibility = "";
+      closing = false;
+    };
+
+    trigger.addEventListener("click", open);
+    dialog.addEventListener("click", close);
+    dialog.addEventListener("cancel", event => {
+      event.preventDefault();
+      close();
+    });
+  });
+</script>
+
+<style>
+  .cv {
+    width: min(1120px, calc(100% - 64px));
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 64px;
+  }
+
+  /* Sticky identity column */
+  .cv-side {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-block: 56px 40px;
+  }
+  .cv-photo-btn {
+    width: fit-content;
+    border-radius: 50%;
+    cursor: zoom-in;
+  }
+  .cv-photo {
+    transition: transform 220ms;
+  }
+  .cv-photo-btn:hover .cv-photo {
+    transform: scale(1.05);
+  }
+  .cv-lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 16px;
+    border: 0;
+    display: none;
+    place-items: center;
+    background: rgb(8 11 16 / 0.82);
+    backdrop-filter: blur(10px);
+    cursor: zoom-out;
+  }
+  .cv-lightbox[open] {
+    display: grid;
+  }
+  .cv-lightbox::backdrop {
+    background: transparent;
+  }
+  .cv-lightbox img {
+    width: auto;
+    height: auto;
+    max-width: min(100%, 560px);
+    max-height: 86dvh;
+    border-radius: 20px;
+    will-change: transform, clip-path;
+  }
+  .cv-photo {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+  }
+  .cv-name {
+    margin-top: 20px;
+    font-size: clamp(36px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+  }
+  .cv-role {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 550;
+    color: var(--accent);
+  }
+  .cv-tagline {
+    margin-top: 14px;
+    max-width: 360px;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+  }
+  .cv-facts {
+    display: flex;
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .cv-facts li {
+    display: flex;
+    flex-direction: column;
+    max-width: 120px;
+  }
+  .cv-facts strong {
+    font-size: 22px;
+    font-weight: 650;
+  }
+  .cv-facts span {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+  }
+  .cv-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 40px;
+  }
+  .cv-nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-block: 8px;
+    width: fit-content;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .cv-nav-line {
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: currentColor;
+    transition: width 180ms;
+  }
+  .cv-nav a:hover,
+  .cv-nav a.active {
+    color: var(--foreground);
+  }
+  .cv-nav a:hover .cv-nav-line,
+  .cv-nav a.active .cv-nav-line {
+    width: 64px;
+  }
+  .cv-socials {
+    margin-top: auto;
+    padding-top: 32px;
+    color: var(--muted-foreground);
+  }
+
+  /* Scrolling content column */
+  .cv-content {
+    padding-block: 56px 96px;
+  }
+  .cv-section {
+    scroll-margin-top: 32px;
+    margin-bottom: 88px;
+  }
+  .cv-heading {
+    margin-bottom: 24px;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .cv-prose :global(p) {
+    margin-bottom: 16px;
+    line-height: 1.75;
+    color: var(--muted-foreground);
+  }
+  .cv-prose :global(strong) {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
+  .cv-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cv-chips > :global(*) {
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 550;
+    line-height: 1.5;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .cv-domains {
+    margin-top: 8px;
+  }
+
+  /* Cards: hover one, dim the rest */
+  .cv-list,
+  .cv-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cv-card {
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-inline: -20px;
+    transition:
+      opacity 180ms,
+      background 180ms,
+      border-color 180ms;
+  }
+  .cv-card:hover,
+  .cv-card:focus-within {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+  @media (hover: hover) {
+    .cv-list:hover .cv-card:not(:hover),
+    .cv-projects:hover .cv-card:not(:hover) {
+      opacity: 0.55;
+    }
+  }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .cv-list summary {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 16px;
+  }
+  .cv-period {
+    padding-top: 3px;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+  }
+  .cv-main {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cv-title {
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .cv-org {
+    color: var(--accent);
+  }
+  a.cv-org:hover {
+    text-decoration: underline;
+  }
+  .cv-list .cv-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .cv-logo,
+  .cv-client img {
+    flex: none;
+    border-radius: 5px;
+    background: #fff;
+    object-fit: contain;
+  }
+  .cv-logo {
+    margin-top: 2px;
+    padding: 2px;
+    width: 22px;
+    height: 22px;
+  }
+  .cv-clients {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+  }
+  .cv-clients-label {
+    margin-right: 2px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+  .cv-client {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px 4px 5px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--background);
+    font-size: 13px;
+    font-weight: 550;
+    transition: border-color 180ms;
+  }
+  .cv-client img {
+    padding: 1px;
+    border-radius: 4px;
+  }
+  .cv-client:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .cv-group + .cv-group {
+    margin-top: 12px;
+  }
+  .cv-group-title {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--foreground);
+  }
+  .cv-group-title a:hover {
+    color: var(--accent);
+  }
+  .cv-toggle::after {
+    content: "+";
+    display: inline-block;
+    margin-left: 8px;
+    color: var(--muted-foreground);
+    transition: transform 180ms;
+  }
+  details[open] .cv-toggle::after {
+    transform: rotate(45deg);
+  }
+  .cv-headline {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+  }
+  .cv-details {
+    padding-left: 126px;
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--muted-foreground);
+  }
+  .cv-details ul {
+    list-style: none;
+  }
+  .cv-details li {
+    position: relative;
+    padding-left: 16px;
+  }
+  .cv-details li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+  .cv-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .cv-link:hover {
+    text-decoration: underline;
+  }
+  .cv-all {
+    margin-top: 20px;
+  }
+
+  .cv-subheading {
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .cv-edu {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  /* Projects */
+  .cv-project .cv-title a:hover {
+    color: var(--accent);
+  }
+  .cv-project .cv-headline {
+    margin-top: 4px;
+  }
+  .cv-more {
+    width: fit-content;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted-foreground);
+  }
+  .cv-more::after {
+    content: " +";
+  }
+  details[open] > .cv-more::after {
+    content: " −";
+  }
+  .cv-more:hover {
+    color: var(--foreground);
+  }
+  .cv-project .cv-details {
+    padding-left: 0;
+    margin-top: 6px;
+  }
+  .cv-project-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .cv-project-foot .cv-link {
+    margin-top: 0;
+  }
+
+  /* Skills */
+  .cv-strengths {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .cv-strengths li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .cv-strengths strong {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .cv-strengths span {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--muted-foreground);
+  }
+  .cv-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .cv-skills > div {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 16px;
+  }
+  .cv-skills dt {
+    padding-top: 4px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Writing */
+  .cv-posts a {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 16px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cv-post-title {
+    font-weight: 550;
+  }
+  .cv-posts a:hover .cv-post-title {
+    color: var(--accent);
+  }
+
+  @media (max-width: 960px) {
+    .cv {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .cv-side {
+      position: static;
+      max-height: none;
+      padding-bottom: 0;
+    }
+    .cv-nav {
+      display: none;
+    }
+    .cv-socials {
+      padding-top: 20px;
+    }
+    .cv-content {
+      padding-top: 48px;
+    }
+    .cv-section {
+      margin-bottom: 64px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cv {
+      width: calc(100% - 32px);
+    }
+    .cv-facts {
+      gap: 20px;
+    }
+    .cv-card {
+      margin-inline: -12px;
+      padding: 16px 12px;
+    }
+    .cv-list summary,
+    .cv-edu,
+    .cv-posts a,
+    .cv-skills > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+    .cv-details {
+      padding-left: 0;
+    }
+    .cv-strengths {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

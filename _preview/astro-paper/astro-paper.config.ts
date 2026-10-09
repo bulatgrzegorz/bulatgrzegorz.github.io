@@ -22,10 +22,11 @@ export default defineAstroPaperConfig({
   },
   socials: [
     { name: "github", url: "https://github.com/bulatgrzegorz" },
-    {
-      name: "linkedin",
-      url: "https://www.linkedin.com/in/grzegorz-bułat-009b65b3/",
-    },
+    // Disabled until there is a LinkedIn profile again.
+    // {
+    //   name: "linkedin",
+    //   url: "https://www.linkedin.com/in/grzegorz-bułat-009b65b3/",
+    // },
     { name: "mail", url: "mailto:grzegorz.bulat1@gmail.com" },
   ],
 });
