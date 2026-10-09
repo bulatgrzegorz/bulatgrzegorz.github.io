@@ -62,24 +62,47 @@ body {
   initial-value: 0;
 }
 .site-nav > a.nav-about-neon {
+  /* Lit, the text is the tube's pale core; the glow carries the colour. */
+  --core: color-mix(in srgb, var(--accent) 45%, #fff);
+  position: relative;
+  isolation: isolate;
   color: color-mix(
     in srgb,
-    var(--accent) calc(var(--lvl) * 100%),
+    var(--core) calc(var(--lvl) * 100%),
     var(--muted-foreground)
   );
   text-shadow:
-    0 0 2px
-      color-mix(in srgb, var(--accent) calc(var(--lvl) * 90%), transparent),
-    0 0 8px
-      color-mix(in srgb, var(--accent) calc(var(--lvl) * 70%), transparent),
-    0 0 18px
-      color-mix(in srgb, var(--accent) calc(var(--lvl) * 50%), transparent),
-    0 0 34px
-      color-mix(in srgb, var(--accent) calc(var(--lvl) * 30%), transparent);
+    0 0 1px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 100%), transparent),
+    0 0 4px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 100%), transparent),
+    0 0 10px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 100%), transparent),
+    0 0 20px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 80%), transparent),
+    0 0 40px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 60%), transparent);
   transition: --lvl var(--t, 100ms) ease-in-out;
 }
+/* Halo: the light the tube throws on the wall behind it. */
+.site-nav > a.nav-about-neon::before {
+  /* --lvl is registered non-inheriting; follow the link's brightness. */
+  --lvl: inherit;
+  content: "";
+  position: absolute;
+  inset: -16px -28px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--accent) calc(var(--lvl) * 40%), transparent),
+    transparent
+  );
+  filter: blur(6px);
+  pointer-events: none;
+}
 .site-nav > a.nav-about-neon:hover {
-  color: color-mix(in srgb, var(--accent) 60%, #fff);
+  color: #fff;
 }
 
 .icon-button {
