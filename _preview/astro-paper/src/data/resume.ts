@@ -27,7 +27,7 @@ export type Project = {
 
 export const facts = [
   { value: "10+", label: "years building back-end systems" },
-  { value: "5", label: "companies, fintech to debt collection" },
+  { value: "1M+", label: "people reached by systems I've built" },
   { value: "Wrocław", label: "Poland" },
 ];
 
@@ -46,7 +46,7 @@ export const jobs: Job[] = [
     logo: "/assets/img/logos/stonex.png",
     role: "Senior C# .NET Developer",
     headline:
-      "Back-end and API logic for online trading platforms — and moving them to the cloud.",
+      "Back-end and API logic for retail trading platforms with 260k+ clients — and moving them to the cloud.",
     clients: [
       {
         name: "FOREX.com",
@@ -81,7 +81,7 @@ export const jobs: Job[] = [
         title: "Trading platforms",
         items: [
           "Back-end and API logic for the FOREX.com, City Index and MetaTrader apps.",
-          "Worked on the TradingView integration project.",
+          "Worked on the TradingView integration, bringing FOREX.com to 100M+ traders.",
         ],
       },
       {
@@ -128,7 +128,7 @@ export const jobs: Job[] = [
         title: "ParkingEye",
         url: "https://www.parkingeye.co.uk",
         items: [
-          "Rebuilt the database deployment system, making migrations standardised and automated.",
+          "Rebuilt database deployments for a platform managing 4,000+ UK car parks — migrations are now standardised and automated.",
           "Built an automation module for reporting.",
         ],
       },
@@ -177,7 +177,7 @@ export const jobs: Job[] = [
         title: "wingo.pl",
         url: "https://wingo.pl",
         items: [
-          "Built the back-end of wingo.pl — submit a debt for collection quickly and easily.",
+          "Built the back-end of wingo.pl — submit a debt for collection in under a minute.",
         ],
       },
       {

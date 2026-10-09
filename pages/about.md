@@ -7,7 +7,7 @@ description: Grzegorz Bułat — senior C# .NET developer. Experience, projects 
 permalink: /about/
 ---
 
-I'm a software developer with over 10 years of experience, mostly building back-end systems in **finance, trading and debt collection**. Right now I work on high-performance, distributed financial systems at **StoneX**.
+I'm a software developer with over 10 years of experience, mostly building back-end systems in **finance, trading and debt collection**. These days I build high-performance, distributed financial systems.
 
 I like delivering things that are genuinely useful — to the business and to other developers. I love simple, self-explanatory code, and I have a lot of fun building **tools and libraries for developers**. I also enjoy the planning side of team work, and I just love learning new things.
 
