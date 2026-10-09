@@ -32,7 +32,10 @@ const brandHref = currentPath === "/" ? "/about/" : "/";
     >
     <a
       class="nav-about"
-      class:list={{ selected: currentPath.startsWith("/about") }}
+      class:list={{
+        selected: currentPath.startsWith("/about"),
+        "nav-about-neon": currentPath === "/",
+      }}
       href="/about/">About</a
     >
     <a
@@ -43,3 +46,81 @@ const brandHref = currentPath === "/" ? "/about/" : "/";
     >
   </nav>
 </header>
+
+<script>
+  // Home page "About" link: a neon tube. Its brightness (--lvl, 0–1) hums
+  // just below full, and at random moments sputters, fades out or browns
+  // out before climbing back to the top.
+  document.addEventListener("astro:page-load", () => {
+    const sign = document.querySelector<HTMLElement>(".nav-about-neon");
+    if (!sign || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let alive = true;
+    document.addEventListener("astro:before-swap", () => (alive = false), {
+      once: true,
+    });
+    const random = (min: number, max: number) =>
+      min + Math.random() * (max - min);
+    const wait = (ms: number) =>
+      new Promise(resolve => setTimeout(resolve, ms));
+    // Ease to a brightness level over `ms`, then resolve.
+    const to = (level: number, ms: number) => {
+      if (!alive) return Promise.resolve();
+      sign.style.setProperty("--t", `${Math.round(ms)}ms`);
+      sign.style.setProperty("--lvl", level.toFixed(2));
+      return wait(ms);
+    };
+    const climb = async () => {
+      for (const level of [0.35, 0.15, 0.6, 0.4, 0.85, 0.7]) {
+        await to(level * random(0.85, 1.1), random(40, 140));
+      }
+      await to(1, random(250, 500));
+    };
+    // A cold tube: flashes and dark gaps for a couple of seconds.
+    const strike = async () => {
+      for (let i = Math.round(random(6, 9)); i > 0 && alive; i--) {
+        await to(random(0.3, 0.9), random(30, 90));
+        await to(0, random(30, 80));
+        await wait(Math.random() < 0.35 ? random(150, 450) : random(20, 120));
+      }
+      await climb();
+    };
+    const hum = async (ms: number) => {
+      const end = Date.now() + ms;
+      while (alive && Date.now() < end)
+        await to(random(0.75, 1), random(250, 600));
+    };
+    const events = [
+      // Sputter: jittery mid-level flicks, then back up.
+      async () => {
+        for (let i = Math.round(random(2, 5)); i > 0; i--) {
+          await to(random(0.1, 0.7), random(30, 110));
+          await to(random(0.6, 1), random(40, 160));
+        }
+        await to(1, random(200, 400));
+      },
+      // Fade out: sink almost dark, rest, then stutter back to the top.
+      async () => {
+        await to(0, random(80, 250));
+        await wait(random(400, 1500));
+        await strike();
+      },
+      // Brown-out: slow dim to about half, a flick, recover.
+      async () => {
+        await to(random(0.45, 0.6), random(600, 1100));
+        await wait(random(200, 600));
+        await to(0.2, 60);
+        await to(1, random(400, 800));
+      },
+    ];
+
+    (async () => {
+      await wait(700);
+      await strike();
+      while (alive) {
+        await hum(random(1500, 4500));
+        if (alive) await events[Math.floor(Math.random() * events.length)]();
+      }
+    })();
+  });
+</script>

@@ -278,14 +278,16 @@ const sections = [
           {
             projects.map(p => (
               <li class="cv-card cv-project">
-                <h3 class="cv-title">
-                  <a href={p.repo}>
-                    {p.name} <span aria-hidden="true">↗</span>
-                  </a>
-                </h3>
-                <p class="cv-headline">{p.headline}</p>
                 <details>
-                  <summary class="cv-more">More</summary>
+                  <summary>
+                    <h3 class="cv-title">
+                      <a href={p.repo}>
+                        {p.name} <span aria-hidden="true">↗</span>
+                      </a>
+                      <span class="cv-toggle" aria-hidden="true" />
+                    </h3>
+                    <p class="cv-headline">{p.headline}</p>
+                  </summary>
                   <p class="cv-details">{p.details}</p>
                 </details>
                 <div class="cv-project-foot">
@@ -398,6 +400,22 @@ const sections = [
         once: true,
       }
     );
+  });
+
+  // Project cards: the summary (title + headline) toggles the details
+  // natively; this extends that to the rest of the card, except links and
+  // text selection.
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>(".cv-project").forEach(card => {
+      const details = card.querySelector("details");
+      if (!details) return;
+      card.addEventListener("click", event => {
+        const target = event.target as Element;
+        if (target.closest("a, summary")) return;
+        if (getSelection()?.toString()) return;
+        details.open = !details.open;
+      });
+    });
   });
 
   // Stack and language docks: icons near the pointer grow, like the macOS
@@ -1058,20 +1076,8 @@ const sections = [
   .cv-project .cv-headline {
     margin-top: 4px;
   }
-  .cv-more {
-    width: fit-content;
-    margin-top: 6px;
-    font-size: 13px;
-    color: var(--muted-foreground);
-  }
-  .cv-more::after {
-    content: " +";
-  }
-  details[open] > .cv-more::after {
-    content: " −";
-  }
-  .cv-more:hover {
-    color: var(--foreground);
+  .cv-project {
+    cursor: pointer;
   }
   .cv-project .cv-details {
     padding-left: 0;

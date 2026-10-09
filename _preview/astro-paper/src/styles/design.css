@@ -53,6 +53,35 @@ body {
 .site-nav .selected {
   color: var(--foreground);
 }
+/* Home page only: the About link glows like a neon sign. The script in
+   Header.astro moves --lvl (brightness, 0–1) to make it flicker. */
+@property --lvl {
+  syntax: "<number>";
+  inherits: false;
+  /* Dark until the script switches it on. */
+  initial-value: 0;
+}
+.site-nav > a.nav-about-neon {
+  color: color-mix(
+    in srgb,
+    var(--accent) calc(var(--lvl) * 100%),
+    var(--muted-foreground)
+  );
+  text-shadow:
+    0 0 2px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 90%), transparent),
+    0 0 8px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 70%), transparent),
+    0 0 18px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 50%), transparent),
+    0 0 34px
+      color-mix(in srgb, var(--accent) calc(var(--lvl) * 30%), transparent);
+  transition: --lvl var(--t, 100ms) ease-in-out;
+}
+.site-nav > a.nav-about-neon:hover {
+  color: color-mix(in srgb, var(--accent) 60%, #fff);
+}
+
 .icon-button {
   display: grid;
   place-items: center;
