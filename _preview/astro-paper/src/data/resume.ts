@@ -31,6 +31,25 @@ export const facts = [
   { value: "Wrocław", label: "Poland" },
 ];
 
+// Icon dock under the facts. `icon` is a file name in src/assets/stack/
+// (brand icons from devicon.dev, MIT). Only the first `stackVisible` show
+// until the dock is hovered or the "+N" tile is pressed.
+export const stackVisible = 8;
+export const stack = [
+  { name: "C#", icon: "csharp" },
+  { name: ".NET", icon: "dotnet" },
+  { name: "Azure", icon: "azure" },
+  { name: "SQL Server", icon: "sqlserver" },
+  { name: "MongoDB", icon: "mongodb" },
+  { name: "Kubernetes", icon: "kubernetes" },
+  { name: "Docker", icon: "docker" },
+  { name: "Kafka", icon: "kafka" },
+  { name: "OpenTelemetry", icon: "opentelemetry" },
+  { name: "Grafana", icon: "grafana" },
+  { name: "Datadog", icon: "datadog" },
+  { name: "GitHub Actions", icon: "githubactions" },
+];
+
 export const domains = [
   "Fintech & banking",
   "Trading",
@@ -339,6 +358,12 @@ export const education = {
   period: "2012 — 2016",
   school: "Wrocław University of Science and Technology",
   field: "Mathematics",
+  logo: "/assets/img/logos/pwr-math.png",
 };
 
-export const languages = ["Polish — native", "English — fluent"];
+// Shown in Skills, and as a row of flags under the stack dock.
+// `flag` is a file name in src/assets/stack/ (from flag-icons, MIT).
+export const languages = [
+  { name: "Polish", level: "native", flag: "flag-pl" },
+  { name: "English", level: "fluent", flag: "flag-gb" },
+];

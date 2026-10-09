@@ -15,8 +15,21 @@ import {
   languages,
   projects,
   skillGroups,
+  stack,
+  stackVisible,
   strengths,
 } from "@/data/resume";
+
+const stackIcons = import.meta.glob<string>("/src/assets/stack/*.svg", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const stackIcon = (name: string) => {
+  const url = stackIcons[`/src/assets/stack/${name}.svg`];
+  if (!url) throw new Error(`Missing stack icon: src/assets/stack/${name}.svg`);
+  return url;
+};
 
 const about = await getEntry("pages", "about");
 
@@ -88,6 +101,58 @@ const sections = [
           ))
         }
       </ul>
+
+      <div class="cv-docks" style={`--count: ${stack.length}`}>
+        <ul class="cv-dock" aria-label="Main tech stack">
+          {
+            stack.map((s, i) => (
+              <li
+                class:list={[
+                  "cv-dock-item",
+                  { "cv-dock-extra": i >= stackVisible },
+                ]}
+                data-label={s.name}
+              >
+                <img
+                  src={stackIcon(s.icon)}
+                  width="32"
+                  height="32"
+                  alt={s.name}
+                />
+              </li>
+            ))
+          }
+          {
+            stack.length > stackVisible && (
+              <li class="cv-dock-more">
+                <button
+                  type="button"
+                  aria-label={`Show ${stack.length - stackVisible} more`}
+                >
+                  +{stack.length - stackVisible}
+                </button>
+              </li>
+            )
+          }
+        </ul>
+        <ul class="cv-dock" aria-label="Languages">
+          {
+            languages.map(l => (
+              <li
+                class="cv-dock-item cv-dock-lang"
+                data-label={`${l.name} — ${l.level}`}
+              >
+                <img
+                  src={stackIcon(l.flag)}
+                  width="32"
+                  height="32"
+                  alt={`${l.name} — ${l.level}`}
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
       <nav class="cv-nav" aria-label="Page sections">
         {
@@ -192,7 +257,17 @@ const sections = [
         <div class="cv-edu">
           <span class="cv-period">{education.period}</span>
           <p class="cv-title">
-            {education.field} · <span class="cv-org">{education.school}</span>
+            <img
+              class="cv-logo"
+              src={education.logo}
+              width="20"
+              height="20"
+              alt=""
+            />
+            <span>
+              {education.field} ·{" "}
+              <span class="cv-org">{education.school}</span>
+            </span>
           </p>
         </div>
       </section>
@@ -262,7 +337,13 @@ const sections = [
           <div>
             <dt>Languages</dt>
             <dd class="cv-chips">
-              {languages.map(l => <span>{l}</span>)}
+              {
+                languages.map(l => (
+                  <span>
+                    {l.name} — {l.level}
+                  </span>
+                ))
+              }
             </dd>
           </div>
         </dl>
@@ -318,6 +399,66 @@ const sections = [
       }
     );
   });
+
+  // Stack and language docks: icons near the pointer grow, like the macOS
+  // Dock.
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>(".cv-dock").forEach(setUpDock);
+  });
+
+  function setUpDock(dock: HTMLElement) {
+    // Hover reveals the rest of the stack; the "+N" tile does it for touch
+    // and keyboard, and keeps it open.
+    dock
+      .querySelector(".cv-dock-more button")
+      ?.addEventListener("click", () => dock.classList.add("is-open"));
+    if (
+      !matchMedia("(hover: hover)").matches ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+
+    const items = [...dock.querySelectorAll<HTMLElement>(".cv-dock-item")];
+    const maxScale = 1.7;
+    let frame = 0;
+    let pointerX = 0;
+
+    // Scales come from the resting layout, not the live one, so the dock
+    // doesn't feed back on itself. Growth left of the pointer is shifted
+    // out to the left, which keeps the hovered icon under the cursor.
+    const magnify = () => {
+      frame = 0;
+      const tile = dock.clientHeight;
+      const step = tile + parseFloat(getComputedStyle(dock).columnGap);
+      const x = pointerX - dock.getBoundingClientRect().left;
+      let shift = 0;
+      items.forEach((item, i) => {
+        const left = i * step;
+        const distance = Math.min(
+          Math.abs(x - left - tile / 2) / (tile * 3),
+          1
+        );
+        const scale = 1 + (maxScale - 1) * Math.cos((distance * Math.PI) / 2);
+        const covered = Math.min(Math.max((x - left) / tile, 0), 1);
+        shift += tile * (scale - 1) * covered;
+        item.style.setProperty("--s", scale.toFixed(3));
+      });
+      // Shift the tiles, not the list: the list's box is the hover area,
+      // and moving it would slide it out from under the pointer.
+      dock.style.setProperty("--shift", `${-shift}px`);
+    };
+
+    dock.addEventListener("pointermove", event => {
+      pointerX = event.clientX;
+      frame ||= requestAnimationFrame(magnify);
+    });
+    dock.addEventListener("pointerleave", () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      items.forEach(item => item.style.removeProperty("--s"));
+      dock.style.removeProperty("--shift");
+    });
+  }
 
   // Photo lightbox: the enlarged photo grows out of the round thumbnail.
   document.addEventListener("astro:page-load", () => {
@@ -493,6 +634,150 @@ const sections = [
     line-height: 1.4;
     color: var(--muted-foreground);
   }
+  /* Stack dock: tiles grow upwards; --s is set per tile by the script. */
+  .cv-side {
+    container-type: inline-size;
+  }
+  .cv-dock {
+    --gap: 6px;
+    --tile: min(
+      36px,
+      (100cqi - (var(--count) - 1) * var(--gap)) / var(--count)
+    );
+    display: flex;
+    align-items: flex-end;
+    gap: var(--gap);
+    width: fit-content;
+    height: var(--tile);
+  }
+  .cv-docks {
+    display: flex;
+    flex-direction: column;
+    /* Room for a magnified flag to grow without covering the stack row. */
+    gap: 24px;
+    margin-top: 36px;
+  }
+  .cv-dock li {
+    position: relative;
+    flex: none;
+    --size: calc(var(--tile) * var(--s, 1));
+    width: var(--size);
+    height: var(--size);
+    padding: calc(var(--size) * 0.16);
+    border: 1px solid var(--border);
+    border-radius: 24%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+    translate: var(--shift, 0);
+    transition:
+      translate 140ms ease-out,
+      width 140ms ease-out,
+      height 140ms ease-out,
+      padding 140ms ease-out,
+      margin 140ms ease-out,
+      border-width 140ms ease-out,
+      opacity 140ms;
+  }
+  .cv-dock img {
+    width: 100%;
+    height: 100%;
+  }
+  .cv-dock .cv-dock-more {
+    display: grid;
+    background: var(--surface);
+  }
+  .cv-dock-more button {
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--muted-foreground);
+    cursor: pointer;
+  }
+  .cv-dock-more button:hover {
+    color: var(--foreground);
+  }
+  /* Collapsed tiles: zero width, and the negative margin eats their gap. */
+  .cv-dock:not(:hover, :focus-within, .is-open) .cv-dock-extra,
+  .cv-dock:is(:hover, :focus-within, .is-open) .cv-dock-more {
+    width: 0;
+    margin-left: calc(-1 * var(--gap));
+    padding-inline: 0;
+    border-width: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* Flags fill the whole tile (no overflow: hidden, it would clip the label). */
+  .cv-dock .cv-dock-lang {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  /* Sticker peel: hover cuts the bottom-right corner off the flag, and
+     ::before draws that corner folded back over it. */
+  .cv-dock-lang img {
+    border: 1px solid var(--border);
+    border-radius: inherit;
+    object-fit: cover;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+    transition: clip-path 220ms ease-out;
+  }
+  .cv-dock-lang::before {
+    content: "";
+    position: absolute;
+    /* The clipped img paints in the positioned layer; stay above it. */
+    z-index: 1;
+    right: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-top-left-radius: 30%;
+    background: linear-gradient(
+      to bottom right,
+      #fff 0%,
+      #e4e4e4 42%,
+      #a8a8a8 50%
+    );
+    box-shadow: -1px -1px 3px rgb(0 0 0 / 0.25);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    transition:
+      width 220ms ease-out,
+      height 220ms ease-out;
+  }
+  .cv-dock-lang:hover img {
+    clip-path: polygon(0 0, 100% 0, 100% 60%, 60% 100%, 0 100%);
+  }
+  .cv-dock-lang:hover::before {
+    width: 40%;
+    height: 40%;
+  }
+  .cv-dock-item::after {
+    content: attr(data-label);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    translate: -50% -4px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 550;
+    white-space: nowrap;
+    color: var(--background);
+    background: var(--foreground);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 140ms,
+      translate 140ms;
+  }
+  /* Lift the hovered tile so its label covers the row below. */
+  .cv-dock-item:hover {
+    z-index: 1;
+  }
+  .cv-dock-item:hover::after {
+    opacity: 1;
+    translate: -50% 0;
+  }
+
   .cv-nav {
     display: flex;
     flex-direction: column;
@@ -641,7 +926,8 @@ const sections = [
   a.cv-org:hover {
     text-decoration: underline;
   }
-  .cv-list .cv-title {
+  .cv-list .cv-title,
+  .cv-edu .cv-title {
     display: flex;
     align-items: flex-start;
     gap: 10px;
