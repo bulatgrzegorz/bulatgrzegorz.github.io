@@ -402,20 +402,22 @@ const sections = [
     );
   });
 
-  // Project cards: the summary (title + headline) toggles the details
-  // natively; this extends that to the rest of the card, except links and
-  // text selection.
+  // Experience and project cards: the summary toggles the details natively;
+  // this extends that to the rest of the card (including the expanded
+  // details), except links and text selection.
   document.addEventListener("astro:page-load", () => {
-    document.querySelectorAll<HTMLElement>(".cv-project").forEach(card => {
-      const details = card.querySelector("details");
-      if (!details) return;
-      card.addEventListener("click", event => {
-        const target = event.target as Element;
-        if (target.closest("a, summary")) return;
-        if (getSelection()?.toString()) return;
-        details.open = !details.open;
+    document
+      .querySelectorAll<HTMLElement>(".cv-list .cv-card, .cv-project")
+      .forEach(card => {
+        const details = card.querySelector("details");
+        if (!details) return;
+        card.addEventListener("click", event => {
+          const target = event.target as Element;
+          if (target.closest("a, summary")) return;
+          if (getSelection()?.toString()) return;
+          details.open = !details.open;
+        });
       });
-    });
   });
 
   // Stack and language docks: icons near the pointer grow, like the macOS
@@ -1076,6 +1078,7 @@ const sections = [
   .cv-project .cv-headline {
     margin-top: 4px;
   }
+  .cv-list .cv-card,
   .cv-project {
     cursor: pointer;
   }
