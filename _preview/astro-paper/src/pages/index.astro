@@ -6,6 +6,7 @@ import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
+import config from "@/config";
 const posts = getSortedPosts(await getCollection("posts"));
 const [featured, ...recent] = posts;
 const featuredDate =
@@ -16,9 +17,39 @@ const featuredDate =
     year: "numeric",
     timeZone: "UTC",
   }).format(featured.data.pubDatetime);
+
+// Tells Google which spellings and profiles belong to this person, for name searches.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: config.site.title,
+      alternateName: ["Grzegorz Bulat", "bulatgrzegorz"],
+      url: config.site.url,
+    },
+    {
+      "@type": "Person",
+      name: config.site.author,
+      alternateName: ["Grzegorz Bulat", "bulatgrzegorz"],
+      url: config.site.url,
+      image: new URL("/assets/img/uploads/profile.jpg", config.site.url).href,
+      jobTitle: "Senior C# .NET Developer",
+      sameAs: config.socials
+        .map(social => social.url)
+        .filter(url => url.startsWith("https://")),
+    },
+  ],
+};
 ---
 
 <Layout>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(structuredData)}
+  />
   <Header />
   <main id="main-content" class="home-layout">
     <section id="hero" class="home-hero">
