@@ -1,3 +1,9 @@
+/* Safety net: never let one wide element scroll the whole page sideways */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
