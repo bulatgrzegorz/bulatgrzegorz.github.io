@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { toTransitionName } from "@/utils/toTransitionName";
+import { cloudinary } from "@/utils/cloudinary";
 
 type Props = { variant?: "h2" | "h3" } & CollectionEntry<"posts">;
 const { variant: Heading = "h2", id, data, filePath } = Astro.props;
@@ -22,7 +23,7 @@ const date = new Intl.DateTimeFormat("en", {
       {
         data.image && (
           <img
-            src={data.optimized_image || data.image}
+            src={cloudinary(data.optimized_image || data.image, 760)}
             alt=""
             loading="lazy"
             decoding="async"

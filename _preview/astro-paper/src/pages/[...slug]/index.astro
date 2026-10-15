@@ -15,6 +15,7 @@ import BackButton from "./_components/BackButton.astro";
 import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
 import config from "@/config";
+import { cloudinary } from "@/utils/cloudinary";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
@@ -119,7 +120,15 @@ const ogImage = initOgImage;
     </div>
 
     {post.data.subtitle && <p class="post-subtitle">{post.data.subtitle}</p>}
-    {post.data.image && <img src={post.data.image} alt="" class="post-cover" />}
+    {
+      post.data.image && (
+        <img
+          src={cloudinary(post.data.image, 1600)}
+          alt=""
+          class="post-cover"
+        />
+      )
+    }
     <nav aria-label="Table of contents" class="post-toc mt-6 border-y py-3">
       <details>
         <summary class="cursor-pointer font-medium">On this page</summary>
