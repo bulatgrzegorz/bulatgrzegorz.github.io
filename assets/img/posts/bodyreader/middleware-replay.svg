@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="690" viewBox="0 0 940 690">
+  <title>Private reader lifetime allows the next handler to reread the buffered request body</title>
+  <desc>Enable buffering before reading. Extract with a private reader. Complete only that reader, leave the stream open, rewind the body to zero, then invoke the next middleware.</desc>
+  <rect width="100%" height="100%" rx="18" fill="#151c27" />
+  <style>text{font-family:Arial,sans-serif;fill:#e7edf5}.muted{fill:#b5c1d1}.blue{fill:#93b7fd}.green{fill:#8bd5a2}.gold{fill:#e6c384}</style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10" fill="#b5c1d1" />
+    </marker>
+  </defs>
+  <text x="470" y="50" font-size="30" class="" text-anchor="middle">Inspect first. Let the handler read again.</text>
+  <rect x="150" y="82" width="640" height="88" rx="10" fill="#243954" stroke="#93b7fd" stroke-width="2" />
+  <text x="470" y="116" font-size="26" class="" text-anchor="middle">1  EnableBuffering()</text>
+  <text x="470" y="148" font-size="21" class="muted" text-anchor="middle">Before any body consumer</text>
+  <path d="M470 173 V189" stroke="#b5c1d1" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="150" y="194" width="640" height="88" rx="10" fill="#243954" stroke="#93b7fd" stroke-width="2" />
+  <text x="470" y="228" font-size="26" class="" text-anchor="middle">2  Private PipeReader + FindAsync</text>
+  <text x="470" y="260" font-size="21" class="muted" text-anchor="middle">Independent reader and parser state</text>
+  <path d="M470 285 V301" stroke="#b5c1d1" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="150" y="306" width="640" height="88" rx="10" fill="#243c35" stroke="#8bd5a2" stroke-width="2" />
+  <text x="470" y="340" font-size="26" class="" text-anchor="middle">3  CompleteAsync() in finally</text>
+  <text x="470" y="372" font-size="21" class="muted" text-anchor="middle">leaveOpen: true keeps Request.Body open</text>
+  <path d="M470 397 V413" stroke="#b5c1d1" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="150" y="418" width="640" height="88" rx="10" fill="#3d3429" stroke="#e6c384" stroke-width="2" />
+  <text x="470" y="452" font-size="26" class="" text-anchor="middle">4  Request.Body.Position = 0</text>
+  <text x="470" y="484" font-size="21" class="muted" text-anchor="middle">Rewind even if parsing or completion fails</text>
+  <path d="M470 509 V525" stroke="#b5c1d1" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="150" y="530" width="640" height="88" rx="10" fill="#243954" stroke="#93b7fd" stroke-width="2" />
+  <text x="470" y="564" font-size="26" class="" text-anchor="middle">5  await next(context)</text>
+  <text x="470" y="596" font-size="21" class="muted" text-anchor="middle">The handler reads the buffered body again</text>
+  <text x="470" y="668" font-size="21" class="muted" text-anchor="middle">Complete the private reader; ASP.NET Core owns the request stream.</text>
+</svg>
