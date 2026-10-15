@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 440" role="img" aria-labelledby="title desc">
+<title id="title">A chat: one request in, one answer out</title>
+<desc id="desc">Your application sends instructions and a user message to the model and receives text back. The order's records are not part of the request, so the model cannot know them.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F0EEE6"/></marker>
+</defs>
+<style>
+.k{fill:#1F1E1D}
+text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;fill:#F0EEE6}
+.h{font-family:Georgia,'Times New Roman',serif;font-size:30px}
+.eye{font-size:13px;font-weight:700;letter-spacing:.14em;fill:#E08A6D}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.1em;fill:#A8A69D}
+.tag{font-size:13px;font-weight:600;fill:#A8A69D}
+.m{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.s{font-size:15px}
+.mu{fill:#A8A69D}
+</style>
+<rect width="1100" height="440" rx="20" fill="#1F1E1D"/>
+<text x="48" y="58" class="eye">1 · CHAT</text>
+<text x="48" y="98" class="h">One request in, one answer out</text>
+
+<rect x="48" y="136" width="440" height="212" rx="14" fill="#2A2927"/>
+<text x="68" y="166" class="lbl">REQUEST</text>
+<rect x="68" y="182" width="400" height="66" rx="10" fill="#34332F"/>
+<text x="84" y="206" class="tag">instructions</text>
+<text x="84" y="232" class="m">You are an order-support assistant…</text>
+<rect x="68" y="260" width="400" height="66" rx="10" fill="#34332F"/>
+<text x="84" y="284" class="tag">user message</text>
+<text x="84" y="310" class="s">What is happening with order ORD-1004?</text>
+
+<path d="M490 242H556" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="560" y="182" width="160" height="120" rx="16" fill="#D97757"/>
+<text x="640" y="238" text-anchor="middle" font-size="22" font-weight="700" class="k">Model</text>
+<text x="640" y="262" text-anchor="middle" font-size="14" class="k">LLM API</text>
+<path d="M722 242H788" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="792" y="136" width="260" height="212" rx="14" fill="#2A2927"/>
+<text x="812" y="166" class="lbl">RESPONSE</text>
+<rect x="812" y="182" width="220" height="144" rx="10" fill="#34332F"/>
+<text x="828" y="206" class="tag">text</text>
+<text x="828" y="240" class="s">“Dude, I don’t even</text>
+<text x="828" y="264" class="s">know what ORD-1004</text>
+<text x="828" y="288" class="s">is.” ¯\_(ツ)_/¯</text>
+
+<text x="48" y="400" class="s mu">The model remembers nothing between requests. If it should know something, it has to be in the request.</text>
+</svg>

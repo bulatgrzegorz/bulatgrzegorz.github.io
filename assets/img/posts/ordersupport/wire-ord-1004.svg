@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 960" role="img" aria-labelledby="title desc">
+<title id="title">ORD-1004 with granular tools, turn by turn</title>
+<desc id="desc">A recorded conversation between the model API, the C# runner and the MCP server. Setup lists four tools. Turn 1 sends instructions, the question and four tool definitions, 718 input tokens, and the model asks for get_order after 1.94 seconds. Turn 2 sends 1,005 input tokens and the model asks for four tools at once after 1.54 seconds; they run concurrently. Turn 3 sends 1,719 input tokens and the model returns the final assessment after 1.80 seconds. 5.29 seconds in total, about 6 milliseconds of it inside MCP tool calls.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F0EEE6"/></marker>
+</defs>
+<style>
+.k{fill:#1F1E1D}
+text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;fill:#F0EEE6}
+.h{font-family:Georgia,'Times New Roman',serif;font-size:30px}
+.eye{font-size:13px;font-weight:700;letter-spacing:.14em;fill:#E08A6D}
+.band{font-size:12px;font-weight:700;letter-spacing:.1em;fill:#A8A69D}
+.bt{font-size:13px;fill:#A8A69D}
+.l{font-size:14px;font-weight:600;text-anchor:middle}
+.lm{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;text-anchor:middle}
+.nt{font-size:13px;fill:#A8A69D;text-anchor:middle}
+.s{font-size:15px}
+.mu{fill:#A8A69D}
+.ln{stroke:#F0EEE6;stroke-width:2}
+</style>
+<rect width="1100" height="960" rx="20" fill="#1F1E1D"/>
+<text x="48" y="58" class="eye">4 · ONE RECORDED CONVERSATION</text>
+<text x="48" y="98" class="h">ORD-1004 with granular tools, turn by turn</text>
+
+<!-- bands -->
+<rect x="48" y="300" width="1004" height="208" rx="12" fill="#2A2927"/>
+<rect x="48" y="520" width="1004" height="208" rx="12" fill="#2A2927"/>
+<rect x="48" y="740" width="1004" height="140" rx="12" fill="#2A2927"/>
+<text x="64" y="232" class="band">SETUP</text><text x="64" y="250" class="bt">once</text>
+<text x="64" y="328" class="band">TURN 1</text><text x="64" y="346" class="bt">1.94 s</text>
+<text x="64" y="548" class="band">TURN 2</text><text x="64" y="566" class="bt">1.54 s</text>
+<text x="64" y="768" class="band">TURN 3</text><text x="64" y="786" class="bt">1.80 s</text>
+
+<!-- lifelines -->
+<path d="M230 196V880M580 196V880M920 196V880" stroke="#6B6A64" stroke-width="1.5" stroke-dasharray="4 6"/>
+<rect x="224" y="352" width="12" height="62" rx="3" fill="#D97757"/>
+<rect x="224" y="572" width="12" height="62" rx="3" fill="#D97757"/>
+<rect x="224" y="792" width="12" height="62" rx="3" fill="#D97757"/>
+
+<!-- lane headers -->
+<rect x="120" y="128" width="220" height="68" rx="14" fill="#D97757"/>
+<text x="230" y="158" text-anchor="middle" font-size="17" font-weight="700" class="k">Model API</text>
+<text x="230" y="180" text-anchor="middle" font-size="13" class="k">gpt-4.1-mini</text>
+<rect x="470" y="128" width="220" height="68" rx="14" fill="#F0EEE6"/>
+<text x="580" y="158" text-anchor="middle" font-size="17" font-weight="700" style="fill:#1F1E1D">C# runner</text>
+<text x="580" y="180" text-anchor="middle" font-size="13" style="fill:#5E5D59">agent loop + MCP client</text>
+<rect x="810" y="128" width="220" height="68" rx="14" fill="#788C5D"/>
+<text x="920" y="158" text-anchor="middle" font-size="17" font-weight="700" class="k">MCP server</text>
+<text x="920" y="180" text-anchor="middle" font-size="13" class="k">granular tools · stdio</text>
+
+<!-- setup -->
+<path d="M584 236H912" class="ln" marker-end="url(#arrow)"/>
+<text x="750" y="228" class="lm">tools/list</text>
+<path d="M916 276H588" class="ln" marker-end="url(#arrow)"/>
+<text x="750" y="268" class="l">4 tools · name, description, inputSchema</text>
+
+<!-- turn 1 -->
+<path d="M576 352H240" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="344" class="l">instructions + question + 4 tool definitions</text>
+<text x="405" y="372" class="nt">718 tokens in</text>
+<path d="M240 414H576" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="406" class="lm">function_call get_order</text>
+<text x="405" y="434" class="nt">19 tokens out</text>
+<path d="M584 462H912" class="ln" marker-end="url(#arrow)"/>
+<path d="M916 476H588" class="ln" marker-end="url(#arrow)"/>
+<text x="750" y="454" class="lm">tools/call get_order</text>
+<text x="750" y="496" class="nt">order + linked IDs · 3 ms</text>
+
+<!-- turn 2 -->
+<path d="M576 572H240" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="564" class="l">+ the get_order call and its result</text>
+<text x="405" y="592" class="nt">1,005 tokens in</text>
+<path d="M240 634H576" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="626" class="l">4 function_calls in one response</text>
+<text x="405" y="654" class="nt">97 tokens out</text>
+<path d="M584 682H912" class="ln" marker-end="url(#arrow)"/>
+<path d="M916 696H588" class="ln" marker-end="url(#arrow)"/>
+<text x="750" y="674" class="lm">4 × tools/call, concurrently</text>
+<text x="750" y="716" class="nt">payment · 2 reservations · tracking · ~3 ms</text>
+
+<!-- turn 3 -->
+<path d="M576 792H240" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="784" class="l">+ 4 calls and their results</text>
+<text x="405" y="812" class="nt">1,719 tokens in</text>
+<path d="M240 854H576" class="ln" marker-end="url(#arrow)"/>
+<text x="405" y="846" class="l">final JSON: assessment + summary</text>
+<text x="405" y="874" class="nt">111 tokens out</text>
+
+<text x="48" y="918" class="s mu">5.29 s end to end: 5.28 s waiting on three model requests, about 6 ms inside MCP tool calls.</text>
+<text x="48" y="942" class="s mu">3,442 input + 227 output tokens. First recorded ORD-1004 granular run, October 8, 2026.</text>
+</svg>

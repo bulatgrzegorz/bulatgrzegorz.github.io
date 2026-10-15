@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
+<title id="title">Every turn sends the whole conversation again</title>
+<desc id="desc">Input tokens per model request for ORD-1004. Granular tools: 718, then 1,005, then 1,719, for 3,442 in total. Focused tool: 577, then 1,446, for 2,023 in total. Each request repeats everything sent before and adds the newest calls and results.</desc>
+<style>
+.k{fill:#1F1E1D}
+text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;fill:#F0EEE6}
+.h{font-family:Georgia,'Times New Roman',serif;font-size:30px}
+.eye{font-size:13px;font-weight:700;letter-spacing:.14em;fill:#E08A6D}
+.g{font-size:17px;font-weight:700}
+.tot{font-size:14px;fill:#A8A69D;text-anchor:end}
+.r{font-size:14px;fill:#A8A69D}
+.in{font-size:13px;fill:#1F1E1D}
+.inm{font-size:13px;fill:#A8A69D}
+.v{font-size:15px;font-weight:700}
+.a{font-size:14px;fill:#A8A69D}
+.s{font-size:15px}
+.mu{fill:#A8A69D}
+</style>
+<rect width="1100" height="560" rx="20" fill="#1F1E1D"/>
+<text x="48" y="58" class="eye">5 · WHAT EACH REQUEST CARRIES</text>
+<text x="48" y="98" class="h">Every turn sends the whole conversation again</text>
+
+<text x="48" y="152" class="g">Granular tools</text>
+<text x="1052" y="152" class="tot">3,442 input tokens over 3 requests</text>
+<path d="M48 162H1052" stroke="#3D3C38"/>
+<text x="48" y="193" class="r">Request 1</text>
+<rect x="200" y="172" width="236.9" height="32" rx="6" fill="#D97757"/>
+<text x="212" y="193" class="in">prompt + 4 tools</text>
+<text x="447" y="194" class="v">718</text>
+
+<text x="48" y="245" class="r">Request 2</text>
+<rect x="200" y="224" width="236.9" height="32" rx="6" fill="#3D3C38"/>
+<rect x="436.9" y="224" width="94.7" height="32" rx="6" fill="#D97757"/>
+<text x="212" y="245" class="inm">request 1, paid again</text>
+<text x="542" y="246" class="v">1,005</text>
+<text x="596" y="246" class="a">+ get_order call and result</text>
+
+<text x="48" y="297" class="r">Request 3</text>
+<rect x="200" y="276" width="331.7" height="32" rx="6" fill="#3D3C38"/>
+<rect x="531.7" y="276" width="235.6" height="32" rx="6" fill="#D97757"/>
+<text x="212" y="297" class="inm">request 2, paid again</text>
+<text x="778" y="298" class="v">1,719</text>
+<text x="832" y="298" class="a">+ 4 calls and their results</text>
+
+<text x="48" y="362" class="g">Focused tool</text>
+<text x="1052" y="362" class="tot">2,023 input tokens over 2 requests</text>
+<path d="M48 372H1052" stroke="#3D3C38"/>
+<text x="48" y="403" class="r">Request 1</text>
+<rect x="200" y="382" width="190.4" height="32" rx="6" fill="#D97757"/>
+<text x="212" y="403" class="in">prompt + 1 tool</text>
+<text x="401" y="404" class="v">577</text>
+
+<text x="48" y="455" class="r">Request 2</text>
+<rect x="200" y="434" width="190.4" height="32" rx="6" fill="#3D3C38"/>
+<rect x="390.4" y="434" width="286.8" height="32" rx="6" fill="#D97757"/>
+<text x="212" y="455" class="inm">request 1, paid again</text>
+<text x="688" y="456" class="v">1,446</text>
+<text x="742" y="456" class="a">+ context call and result</text>
+
+<rect x="48" y="496" width="14" height="14" rx="3" fill="#D97757"/>
+<text x="70" y="508" class="a">new in this request</text>
+<rect x="222" y="496" width="14" height="14" rx="3" fill="#3D3C38"/>
+<text x="244" y="508" class="a">sent (and billed) again</text>
+<text x="420" y="508" class="a">· prompt = instructions, question, answer schema · API-reported tokens, first ORD-1004 run</text>
+</svg>

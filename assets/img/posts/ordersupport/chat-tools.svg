@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 610" role="img" aria-labelledby="title desc">
+<title id="title">Chat with tools: the model asks, your code acts</title>
+<desc id="desc">The request now carries tool definitions. Instead of text, the model returns a function call for get_order with order ID ORD-1004. Your code runs the tool and returns its output under the same call ID, which joins the next request.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F0EEE6"/></marker>
+<marker id="arrow-mu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#A8A69D"/></marker>
+</defs>
+<style>
+.k{fill:#1F1E1D}
+text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;fill:#F0EEE6}
+.h{font-family:Georgia,'Times New Roman',serif;font-size:30px}
+.eye{font-size:13px;font-weight:700;letter-spacing:.14em;fill:#E08A6D}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.1em;fill:#A8A69D}
+.tag{font-size:13px;font-weight:600;fill:#A8A69D}
+.m{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.s{font-size:15px}
+.mu{fill:#A8A69D}
+</style>
+<rect width="1100" height="610" rx="20" fill="#1F1E1D"/>
+<text x="48" y="58" class="eye">2 · CHAT + TOOLS</text>
+<text x="48" y="98" class="h">The model asks. Your code acts.</text>
+
+<rect x="48" y="136" width="440" height="268" rx="14" fill="#2A2927"/>
+<text x="68" y="166" class="lbl">REQUEST</text>
+<rect x="68" y="182" width="400" height="56" rx="10" fill="#34332F"/>
+<text x="84" y="204" class="tag">instructions</text>
+<text x="84" y="226" class="m">You are an order-support assistant…</text>
+<rect x="68" y="246" width="400" height="56" rx="10" fill="#34332F"/>
+<text x="84" y="268" class="tag">user message</text>
+<text x="84" y="290" class="s">What is happening with order ORD-1004?</text>
+<rect x="68" y="310" width="400" height="78" rx="10" fill="#34332F" stroke="#788C5D" stroke-width="1.5"/>
+<text x="84" y="332" class="tag" style="fill:#A9BC8A">tools · name, description, JSON schema</text>
+<text x="84" y="356" class="m">get_order · get_payment</text>
+<text x="84" y="376" class="m">get_reservation · get_tracking</text>
+
+<path d="M490 270H556" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="560" y="210" width="160" height="120" rx="16" fill="#D97757"/>
+<text x="640" y="266" text-anchor="middle" font-size="22" font-weight="700" class="k">Model</text>
+<text x="640" y="290" text-anchor="middle" font-size="14" class="k">LLM API</text>
+<path d="M722 270H788" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+
+<rect x="792" y="136" width="260" height="268" rx="14" fill="#2A2927"/>
+<text x="812" y="166" class="lbl">RESPONSE</text>
+<rect x="812" y="182" width="220" height="140" rx="10" fill="#34332F" stroke="#D97757" stroke-width="1.5"/>
+<text x="828" y="204" class="tag" style="fill:#E08A6D">function_call</text>
+<text x="828" y="232" class="m">name: get_order</text>
+<text x="828" y="256" class="m">arguments:</text>
+<text x="828" y="276" class="m">{"orderId":"ORD-1004"}</text>
+<text x="828" y="304" class="m">call_id: call_cqXe…</text>
+<text x="812" y="356" class="s mu">Not an answer. More like</text>
+<text x="812" y="378" class="s mu">“can you run this for me?”</text>
+
+<path d="M922 406V446" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="792" y="450" width="260" height="100" rx="16" fill="#F0EEE6"/>
+<text x="812" y="482" font-size="18" font-weight="700" style="fill:#1F1E1D">Your code</text>
+<text x="812" y="508" class="m" style="fill:#1F1E1D">get_order("ORD-1004")</text>
+<text x="812" y="532" font-size="14" style="fill:#5E5D59">does the actual work, via MCP</text>
+
+<path d="M790 500H494" stroke="#F0EEE6" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="48" y="450" width="440" height="100" rx="14" fill="#34332F" stroke="#788C5D" stroke-width="1.5"/>
+<text x="68" y="474" class="tag" style="fill:#A9BC8A">function_call_output · same call_id</text>
+<text x="68" y="498" class="m">{"orderId":"ORD-1004","status":</text>
+<text x="68" y="518" class="m">"partially_shipped","paymentId":</text>
+<text x="68" y="538" class="m">"PAY-1004","reservationIds":[…],…}</text>
+<path d="M268 448V410" stroke="#A8A69D" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-mu)"/>
+<text x="282" y="434" font-size="14" class="mu">joins the next request</text>
+
+<text x="48" y="588" class="s mu">Tool definitions ride along with every request. The model never runs anything. It can only ask nicely.</text>
+</svg>
