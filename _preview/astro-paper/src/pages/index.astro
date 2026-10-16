@@ -6,7 +6,7 @@ import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
-import { cloudinary } from "@/utils/cloudinary";
+import { cloudinary, cloudinarySrcset } from "@/utils/cloudinary";
 import config from "@/config";
 const posts = getSortedPosts(await getCollection("posts"));
 const [featured, ...recent] = posts;
@@ -73,6 +73,8 @@ const structuredData = {
             <div class="featured-image">
               <img
                 src={cloudinary(featured.data.image, 1200)}
+                srcset={cloudinarySrcset(featured.data.image, [600, 1200])}
+                sizes="(max-width: 640px) calc(100vw - 36px), (max-width: 1184px) 52vw, 590px"
                 alt=""
                 fetchpriority="high"
               />

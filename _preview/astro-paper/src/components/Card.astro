@@ -2,10 +2,21 @@
 import type { CollectionEntry } from "astro:content";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { toTransitionName } from "@/utils/toTransitionName";
-import { cloudinary } from "@/utils/cloudinary";
+import { cloudinary, cloudinarySrcset } from "@/utils/cloudinary";
 
-type Props = { variant?: "h2" | "h3" } & CollectionEntry<"posts">;
-const { variant: Heading = "h2", id, data, filePath } = Astro.props;
+// sizes defaults to the .article-grid column width (design.css breakpoints).
+type Props = {
+  variant?: "h2" | "h3";
+  sizes?: string;
+} & CollectionEntry<"posts">;
+const {
+  variant: Heading = "h2",
+  sizes = "(max-width: 640px) calc(100vw - 36px), (max-width: 960px) calc(50vw - 44px), 360px",
+  id,
+  data,
+  filePath,
+} = Astro.props;
+const image = data.optimized_image || data.image;
 const date = new Intl.DateTimeFormat("en", {
   day: "numeric",
   month: "short",
@@ -23,7 +34,9 @@ const date = new Intl.DateTimeFormat("en", {
       {
         data.image && (
           <img
-            src={cloudinary(data.optimized_image || data.image, 760)}
+            src={cloudinary(image, 760)}
+            srcset={cloudinarySrcset(image, [400, 760])}
+            sizes={sizes}
             alt=""
             loading="lazy"
             decoding="async"
