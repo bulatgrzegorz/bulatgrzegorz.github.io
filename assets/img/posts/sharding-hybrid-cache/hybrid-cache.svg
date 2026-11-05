@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 690" role="img" aria-labelledby="title desc">
+<title id="title">Hybrid cache: read top-down, stop at the first hit</title>
+<desc id="desc">Three reads of the same key. L1 hit: the value is in this process's memory, Redis and the database are not touched, no network hops. L2 hit: L1 misses, Redis has the value, it is returned and copied into L1, one network hop. Both miss: L1 and Redis miss, the database loads the value, it is saved to Redis and L1 on the way back. After either miss, the next read is an L1 hit.</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#58c4dd"/></marker>
+<marker id="amber" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f0ac5f"/></marker>
+<marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#83c167"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.h{font-size:24px;font-weight:400}
+.col{font-size:20px;font-weight:400;text-anchor:middle}
+.lbl{font-size:20px;font-weight:400}
+.sub{font-size:15px;fill:#8b8b8b}
+.st{font-size:18px;font-weight:400;text-anchor:middle}
+.note{font-size:15px;fill:#8b8b8b;text-anchor:middle}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;text-anchor:middle}
+.foot{font-size:17px;font-weight:400;text-anchor:middle}
+.hit{fill:#83c167;fill-opacity:.85}
+.miss{fill:#f0ac5f;fill-opacity:.85}
+.box{fill:#1c1c1c;stroke-width:2;stroke-opacity:.55}
+.idle{fill:none;stroke:#444444;stroke-width:2;stroke-dasharray:6 6}
+.pill{fill:#1c1c1c;stroke:#58c4dd;stroke-width:2;stroke-opacity:.55}
+.down{stroke:#58c4dd;stroke-width:2.5;stroke-opacity:.65;fill:none}
+.deeper{stroke:#f0ac5f;stroke-width:2.5;stroke-opacity:.65;fill:none}
+.back{stroke:#83c167;stroke-width:2.5;stroke-opacity:.65;fill:none}
+</style>
+<rect width="1100" height="690" rx="20" fill="#111111"/>
+
+<text x="40" y="62" class="h">Hybrid cache: read top-down, stop at the first hit</text>
+<circle cx="48" cy="93" r="6" fill="#83c167"/><text x="60" y="98" class="sub">hit</text>
+<circle cx="112" cy="93" r="6" fill="#f0ac5f"/><text x="124" y="98" class="sub">miss</text>
+<rect x="180" y="85" width="22" height="16" rx="3" class="idle"/><text x="210" y="98" class="sub">not touched</text>
+<path d="M322 93H356" class="back" marker-end="url(#green)"/><text x="364" y="98" class="sub">value goes back</text>
+
+<text x="40" y="284" class="lbl">L1 · memory</text>
+<text x="40" y="308" class="sub">this process, no network</text>
+<text x="40" y="414" class="lbl">L2 · Redis</text>
+<text x="40" y="438" class="sub">shared, one network hop</text>
+<text x="40" y="544" class="lbl">Database</text>
+<text x="40" y="568" class="sub">source of truth, slowest</text>
+
+<!-- L1 hit -->
+<text x="420" y="152" class="col">L1 hit</text>
+<rect x="330" y="172" width="180" height="40" rx="20" class="pill"/><text x="420" y="197" class="code">GetOrSet(key)</text>
+<path d="M420 214V244" class="down" marker-end="url(#blue)"/>
+<rect x="330" y="250" width="180" height="80" rx="12" class="box" stroke="#83c167"/>
+<text x="420" y="284" class="st hit">✓ hit</text><text x="420" y="308" class="note">answer from memory</text>
+<rect x="330" y="380" width="180" height="80" rx="12" class="idle"/><text x="420" y="426" class="note">not touched</text>
+<rect x="330" y="510" width="180" height="80" rx="12" class="idle"/><text x="420" y="556" class="note">not touched</text>
+<path d="M512 290H534V192H514" class="back" marker-end="url(#green)"/>
+<text x="420" y="630" class="foot hit">fastest</text>
+<text x="420" y="654" class="note">nothing leaves the process</text>
+
+<!-- L2 hit -->
+<text x="680" y="152" class="col">L2 hit</text>
+<rect x="590" y="172" width="180" height="40" rx="20" class="pill"/><text x="680" y="197" class="code">GetOrSet(key)</text>
+<path d="M680 214V244" class="down" marker-end="url(#blue)"/>
+<rect x="590" y="250" width="180" height="80" rx="12" class="box" stroke="#f0ac5f"/>
+<text x="680" y="284" class="st miss">✗ miss</text><text x="680" y="308" class="note">then keeps a copy</text>
+<path d="M680 332V374" class="deeper" marker-end="url(#amber)"/>
+<rect x="590" y="380" width="180" height="80" rx="12" class="box" stroke="#83c167"/>
+<text x="680" y="414" class="st hit">✓ hit</text><text x="680" y="438" class="note">copied into L1</text>
+<rect x="590" y="510" width="180" height="80" rx="12" class="idle"/><text x="680" y="556" class="note">not touched</text>
+<path d="M772 420H794V192H774" class="back" marker-end="url(#green)"/>
+<text x="680" y="630" class="foot">1 network hop</text>
+<text x="680" y="654" class="note">next read: L1 hit</text>
+
+<!-- Both miss -->
+<text x="940" y="152" class="col">Both miss</text>
+<rect x="850" y="172" width="180" height="40" rx="20" class="pill"/><text x="940" y="197" class="code">GetOrSet(key)</text>
+<path d="M940 214V244" class="down" marker-end="url(#blue)"/>
+<rect x="850" y="250" width="180" height="80" rx="12" class="box" stroke="#f0ac5f"/>
+<text x="940" y="284" class="st miss">✗ miss</text><text x="940" y="308" class="note">then keeps a copy</text>
+<path d="M940 332V374" class="deeper" marker-end="url(#amber)"/>
+<rect x="850" y="380" width="180" height="80" rx="12" class="box" stroke="#f0ac5f"/>
+<text x="940" y="414" class="st miss">✗ miss</text><text x="940" y="438" class="note">then keeps a copy</text>
+<path d="M940 462V504" class="deeper" marker-end="url(#amber)"/>
+<rect x="850" y="510" width="180" height="80" rx="12" class="box" stroke="#83c167"/>
+<text x="940" y="544" class="st hit">✓ loaded</text><text x="940" y="568" class="note">the factory runs</text>
+<path d="M1032 550H1054V192H1034" class="back" marker-end="url(#green)"/>
+<text x="940" y="630" class="foot miss">slowest</text>
+<text x="940" y="654" class="note">next read: L1 hit</text>
+</svg>

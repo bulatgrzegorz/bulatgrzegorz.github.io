@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-labelledby="title desc">
+<title id="title">Fail-safe</title>
+<desc id="desc">An entry with value v1 expires while MongoDB is down. Without fail-safe, the next request gets an error. With fail-safe, the expired v1 is still served until MongoDB is back and v2 is loaded.</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#58c4dd"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.t{font-size:24px}
+path,line{stroke-opacity:.65}circle{fill-opacity:.8}.g,.r,.y,.br{fill-opacity:.85}
+.lane{font-size:20px;fill:#bbbbbb}
+.l{font-size:18px;text-anchor:middle}
+.g{fill:#83c167}.r{fill:#fc6255}.br{fill:#f0ac5f}.mut{fill:#8b8b8b}
+.v{fill:#58c4dd;fill-opacity:.12;stroke-opacity:.55;stroke:#58c4dd;stroke-width:2}
+.stale{fill:#f0ac5f;fill-opacity:.08;stroke-opacity:.6;stroke:#f0ac5f;stroke-width:2;stroke-dasharray:8 6}
+</style>
+<rect width="1000" height="420" rx="18" fill="#111111"/>
+<text x="40" y="56" class="t">Fail-safe: the entry expires while MongoDB is down</text>
+
+<rect x="460" y="86" width="330" height="290" fill="#fc6255" fill-opacity=".06"/>
+<text x="625" y="110" class="l r">MongoDB down</text>
+
+<text x="40" y="181" class="lane">without</text>
+<text x="40" y="301" class="lane">with fail-safe</text>
+
+<rect x="230" y="164" width="290" height="22" rx="4" class="v"/><text x="375" y="181" class="l">v1</text>
+<path d="M590 128V158" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<path d="M582 167l16 16M598 167l-16 16" stroke="#fc6255" stroke-width="3"/>
+<text x="590" y="214" class="l r">error</text>
+<rect x="790" y="164" width="160" height="22" rx="4" class="v"/><text x="870" y="181" class="l">v2</text>
+
+<rect x="230" y="284" width="290" height="22" rx="4" class="v"/><text x="375" y="301" class="l">v1</text>
+<rect x="520" y="284" width="270" height="22" rx="4" class="stale"/><text x="690" y="301" class="l br">expired v1</text>
+<path d="M590 248V278" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<text x="590" y="334" class="l g">answers v1</text>
+<rect x="790" y="284" width="160" height="22" rx="4" class="v"/><text x="870" y="301" class="l">v2</text>
+
+<line x1="520" y1="140" x2="520" y2="350" stroke="#8b8b8b" stroke-width="1.5" stroke-dasharray="4 5"/>
+<text x="520" y="398" class="l mut">Duration ends</text>
+<line x1="790" y1="140" x2="790" y2="350" stroke="#8b8b8b" stroke-width="1.5" stroke-dasharray="4 5"/>
+<text x="790" y="398" class="l mut">MongoDB back</text>
+</svg>

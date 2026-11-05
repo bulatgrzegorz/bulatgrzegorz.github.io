@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" role="img" aria-labelledby="title desc">
+<title id="title">Consistent hashing: the first shard point clockwise owns the user</title>
+<desc id="desc">Every uint hash sits on a circle, from 0 at the top all the way around to uint.MaxValue. Each shard has a point on it, and a user walks clockwise from their hash to the first shard point. Before: shard 0 at the top and shard 1 at the bottom, so shard 1 owns the right half and shard 0 the left half, 50% each. Users A and B walk to shard 1, user C to shard 0. After: shard 2 joins at a quarter turn and takes only the slice between shard 0 and itself. User A now walks to shard 2, the only user who changes owner; B and C stay. Shard 0 still owns half, shards 1 and 2 a quarter each.</desc>
+<defs>
+<marker id="s0" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#58c4dd"/></marker>
+<marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f7d96f"/></marker>
+<marker id="s2" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d147bd"/></marker>
+<marker id="grey" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b8b8b"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.h{font-size:24px;font-weight:400}
+.col{font-size:20px;font-weight:400;text-anchor:middle}
+.lbl{font-size:18px;font-weight:400;text-anchor:middle}
+.sub{font-size:15px;fill:#8b8b8b}
+.st{font-size:18px;font-weight:400;text-anchor:middle}
+.note{font-size:15px;fill:#8b8b8b;text-anchor:middle}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;fill:#8b8b8b}
+.foot{font-size:17px;font-weight:400;text-anchor:middle}
+.arc{fill:none;stroke-width:10;stroke-opacity:.8}
+.walk{fill:none;stroke-width:2.5;stroke-opacity:.8;stroke-dasharray:7 5}
+.pt{stroke:#111111;stroke-width:3}
+.user{fill:#ececec}
+.moved{fill:none;stroke:#f0ac5f;stroke-width:2.5}
+</style>
+<rect width="1100" height="660" rx="20" fill="#111111"/>
+
+<text x="40" y="62" class="h">Consistent hashing: the first shard point clockwise owns the user</text>
+<circle cx="48" cy="93" r="6" class="user"/><text x="60" y="98" class="sub">a user's hash</text>
+<circle cx="172" cy="93" r="9" fill="#58c4dd" class="pt"/><text x="188" y="98" class="sub">a shard's point</text>
+<path d="M310 93H350" class="walk" stroke="#8b8b8b" marker-end="url(#grey)"/><text x="358" y="98" class="sub">walks clockwise to its owner</text>
+<circle cx="574" cy="93" r="6" class="user"/><circle cx="574" cy="93" r="11" class="moved"/><text x="592" y="98" class="sub">changes owner</text>
+
+<!-- Before: 2 shards -->
+<text x="300" y="138" class="col">Before: 2 shards</text>
+<path d="M300 200A160 160 0 0 1 300 520" class="arc" stroke="#f7d96f"/>
+<path d="M300 520A160 160 0 0 1 300 200" class="arc" stroke="#58c4dd"/>
+<path d="M398.0 277.7A128 128 0 0 1 317.8 486.8" class="walk" stroke="#f7d96f" marker-end="url(#s1)"/>
+<path d="M382.3 458.0A128 128 0 0 1 317.8 486.8" class="walk" stroke="#f7d96f" marker-end="url(#s1)"/>
+<path d="M179.7 403.8A128 128 0 0 1 282.2 233.2" class="walk" stroke="#58c4dd" marker-end="url(#s0)"/>
+<circle cx="300" cy="200" r="12" fill="#58c4dd" class="pt"/><text x="300" y="172" class="lbl">shard 0</text>
+<text x="318" y="194" class="code">0</text><text x="282" y="194" class="code" text-anchor="end">uint.MaxValue</text>
+<circle cx="300" cy="520" r="12" fill="#f7d96f" class="pt"/><text x="300" y="556" class="lbl">shard 1</text>
+<circle cx="422.6" cy="257.2" r="6" class="user"/><text x="444" y="245" class="lbl">A</text>
+<circle cx="402.8" cy="482.6" r="6" class="user"/><text x="421" y="510" class="lbl">B</text>
+<circle cx="149.6" cy="414.7" r="6" class="user"/><text x="123" y="430" class="lbl">C</text>
+<text x="300" y="354" class="st" style="fill:#58c4dd">shard 0 · 50%</text>
+<text x="300" y="382" class="st" style="fill:#f7d96f">shard 1 · 50%</text>
+<text x="300" y="604" class="foot">each shard owns the slice that ends at its point</text>
+<text x="300" y="628" class="note">A and B belong to shard 1, C to shard 0</text>
+
+<!-- shard 2 joins -->
+<path d="M515 360H585" class="walk" stroke="#d147bd" marker-end="url(#s2)" style="stroke-dasharray:none"/>
+<text x="550" y="342" class="note">shard 2 joins</text>
+<text x="550" y="388" class="note">at a quarter turn</text>
+
+<!-- After: 3 shards -->
+<text x="800" y="138" class="col">After: shard 2 joins</text>
+<path d="M800 200A160 160 0 0 1 960 360" class="arc" stroke="#d147bd"/>
+<path d="M960 360A160 160 0 0 1 800 520" class="arc" stroke="#f7d96f"/>
+<path d="M800 520A160 160 0 0 1 800 200" class="arc" stroke="#58c4dd"/>
+<path d="M898.0 277.7A128 128 0 0 1 926.8 342.2" class="walk" stroke="#d147bd" marker-end="url(#s2)"/>
+<path d="M882.3 458.0A128 128 0 0 1 817.8 486.8" class="walk" stroke="#f7d96f" marker-end="url(#s1)"/>
+<path d="M679.7 403.8A128 128 0 0 1 782.2 233.2" class="walk" stroke="#58c4dd" marker-end="url(#s0)"/>
+<circle cx="800" cy="200" r="12" fill="#58c4dd" class="pt"/><text x="800" y="172" class="lbl">shard 0</text>
+<text x="818" y="194" class="code">0</text><text x="782" y="194" class="code" text-anchor="end">uint.MaxValue</text>
+<circle cx="960" cy="360" r="12" fill="#d147bd" class="pt"/><text x="980" y="366" class="lbl" text-anchor="start" style="text-anchor:start">shard 2</text>
+<circle cx="800" cy="520" r="12" fill="#f7d96f" class="pt"/><text x="800" y="556" class="lbl">shard 1</text>
+<text x="930" y="196" class="sub" style="fill:#d147bd">shard 2 takes</text>
+<text x="930" y="216" class="sub" style="fill:#d147bd">only this slice</text>
+<circle cx="922.6" cy="257.2" r="6" class="user"/><circle cx="922.6" cy="257.2" r="11" class="moved"/><text x="946" y="245" class="lbl" style="fill:#f0ac5f">A</text>
+<circle cx="902.8" cy="482.6" r="6" class="user"/><text x="921" y="510" class="lbl">B</text>
+<circle cx="649.6" cy="414.7" r="6" class="user"/><text x="623" y="430" class="lbl">C</text>
+<text x="800" y="326" class="st" style="fill:#58c4dd">shard 0 · 50%</text>
+<text x="800" y="354" class="st" style="fill:#f7d96f">shard 1 · 25%</text>
+<text x="800" y="382" class="st" style="fill:#d147bd">shard 2 · 25%</text>
+<text x="800" y="604" class="foot">only A changes owner, from shard 1 to shard 2</text>
+<text x="800" y="628" class="note">B and C stay, but shard 0 still holds half the users</text>
+</svg>

@@ -43,7 +43,8 @@
       @apply border-border;
     }
 
-    img {
+    img,
+    video {
       @apply border-border mx-auto border;
     }
 

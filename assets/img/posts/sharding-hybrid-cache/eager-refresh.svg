@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-labelledby="title desc">
+<title id="title">Eager refresh</title>
+<desc id="desc">Without eager refresh, entry v1 expires and the next request misses and waits for a reload. With eager refresh at 90 percent, a request after 90 percent of the duration is answered from the cache and starts a background refresh, so v2 is in place before v1 expires and the next request is a hit.</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#58c4dd"/></marker>
+<marker id="yellow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f7d96f"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.t{font-size:24px}
+path,line{stroke-opacity:.65}circle{fill-opacity:.8}.g,.r,.y,.br{fill-opacity:.85}
+.lane{font-size:20px;fill:#bbbbbb}
+.l{font-size:18px;text-anchor:middle}
+.g{fill:#83c167}.r{fill:#fc6255}.y{fill:#f7d96f}.mut{fill:#8b8b8b}
+.v{fill:#58c4dd;fill-opacity:.12;stroke-opacity:.55;stroke:#58c4dd;stroke-width:2}
+</style>
+<rect width="1000" height="420" rx="18" fill="#111111"/>
+<text x="40" y="56" class="t">Eager refresh: reload before the entry expires</text>
+
+<text x="40" y="176" class="lane">without</text>
+<text x="40" y="296" class="lane">eager refresh</text>
+
+<rect x="230" y="160" width="500" height="22" rx="4" class="v"/><text x="455" y="177" class="l">v1</text>
+<path d="M800 124V154" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<circle cx="800" cy="171" r="8" fill="#fc6255"/>
+<text x="800" y="212" class="l r">miss, waits</text>
+<rect x="820" y="160" width="130" height="22" rx="4" class="v"/><text x="885" y="177" class="l">v2</text>
+
+<line x1="680" y1="234" x2="680" y2="340" stroke="#f7d96f" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="230" y="280" width="470" height="22" rx="4" class="v"/><text x="455" y="297" class="l">v1</text>
+<rect x="700" y="280" width="250" height="22" rx="4" class="v"/><text x="900" y="297" class="l">v2</text>
+<path d="M690 244V274" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<circle cx="690" cy="291" r="7" fill="#83c167"/>
+<path d="M690 302C690 338 740 338 760 308" stroke="#f7d96f" stroke-width="2.5" fill="none" marker-end="url(#yellow)"/>
+<text x="660" y="352" class="l y" style="text-anchor:end">hit, refresh starts in the background</text>
+<path d="M800 244V274" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<circle cx="800" cy="291" r="7" fill="#83c167"/>
+<text x="800" y="334" class="l g">hit</text>
+
+<line x1="230" y1="372" x2="950" y2="372" stroke="#666666" stroke-width="2"/>
+<g stroke="#666666" stroke-width="2"><line x1="230" y1="366" x2="230" y2="378"/><line x1="680" y1="366" x2="680" y2="378"/><line x1="730" y1="366" x2="730" y2="378"/></g>
+<text x="230" y="400" class="l mut">0</text>
+<text x="672" y="400" class="l y" style="text-anchor:end">90%</text>
+<text x="738" y="400" class="l mut" style="text-anchor:start">Duration</text>
+</svg>

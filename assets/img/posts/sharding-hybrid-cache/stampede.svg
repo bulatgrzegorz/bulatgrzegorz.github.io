@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" role="img" aria-labelledby="title desc">
+<title id="title">Cache stampede protection</title>
+<desc id="desc">Five requests miss the same key at once. Without protection, every one of them queries MongoDB: five queries. With FusionCache, the five misses wait on a single factory, which runs one query and shares the result with all five.</desc>
+<defs>
+<marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fc6255"/></marker>
+<marker id="yellow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f7d96f"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.t{font-size:24px}
+path,line{stroke-opacity:.65}circle{fill-opacity:.8}.g,.r,.y,.br{fill-opacity:.85}
+.h{font-size:21px;fill:#bbbbbb;text-anchor:middle}
+.l{font-size:18px;text-anchor:middle}
+.g{fill:#83c167}.r{fill:#fc6255}.y{fill:#f7d96f}.mut{fill:#8b8b8b}
+.req{fill:#58c4dd;fill-opacity:.12;stroke-opacity:.6;stroke:#58c4dd;stroke-width:2.5}
+.db{fill:#699c52;fill-opacity:.12;stroke-opacity:.6;stroke:#699c52;stroke-width:2.5}
+</style>
+<rect width="1000" height="430" rx="18" fill="#111111"/>
+<text x="40" y="56" class="t">Cache stampede: five misses for the same key at once</text>
+<line x1="500" y1="92" x2="500" y2="400" stroke="#2b2b2b" stroke-width="2"/>
+<text x="250" y="110" class="h">without</text>
+<text x="750" y="110" class="h">with FusionCache</text>
+
+<g>
+<circle cx="90" cy="160" r="13" class="req"/><circle cx="90" cy="205" r="13" class="req"/><circle cx="90" cy="250" r="13" class="req"/><circle cx="90" cy="295" r="13" class="req"/><circle cx="90" cy="340" r="13" class="req"/>
+<text x="90" y="388" class="l mut">requests</text>
+<g stroke="#fc6255" stroke-width="2.5" fill="none" marker-end="url(#red)">
+<path d="M106 160L342 230"/><path d="M106 205L342 243"/><path d="M106 250L342 256"/><path d="M106 295L342 269"/><path d="M106 340L342 282"/>
+</g>
+<path d="M350 214v76a40 12 0 0 0 80 0v-76" class="db"/><ellipse cx="390" cy="214" rx="40" ry="12" class="db"/>
+<text x="390" y="338" class="l">MongoDB</text>
+<text x="390" y="370" class="l r">5 queries</text>
+</g>
+
+<g>
+<circle cx="590" cy="160" r="13" class="req"/><circle cx="590" cy="205" r="13" class="req"/><circle cx="590" cy="250" r="13" class="req"/><circle cx="590" cy="295" r="13" class="req"/><circle cx="590" cy="340" r="13" class="req"/>
+<text x="590" y="388" class="l mut">requests</text>
+<g stroke="#58c4dd" stroke-width="2.5" fill="none">
+<path d="M606 160L722 250"/><path d="M606 205L722 250"/><path d="M606 250L722 250"/><path d="M606 295L722 250"/><path d="M606 340L722 250"/>
+</g>
+<circle cx="735" cy="250" r="13" fill="#f7d96f"/>
+<text x="735" y="222" class="l y">one factory</text>
+<path d="M750 250L842 252" stroke="#f7d96f" stroke-width="2.5" fill="none" marker-end="url(#yellow)"/>
+<path d="M850 214v76a40 12 0 0 0 80 0v-76" class="db"/><ellipse cx="890" cy="214" rx="40" ry="12" class="db"/>
+<text x="890" y="338" class="l">MongoDB</text>
+<text x="890" y="370" class="l g">1 query</text>
+<text x="735" y="292" class="l g">result shared</text>
+<text x="735" y="314" class="l g">by all five</text>
+</g>
+</svg>

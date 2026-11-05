@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-labelledby="title desc">
+<title id="title">Jitter</title>
+<desc id="desc">Ten entries are loaded at the same moment on start-up. Without jitter they all expire at the same moment, a single spike of reloads. With JitterMaxDuration each entry gets a slightly different random duration, so the expirations are spread out.</desc>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.t{font-size:24px}
+path,line{stroke-opacity:.65}circle{fill-opacity:.8}.g,.r,.y,.br{fill-opacity:.85}
+.h{font-size:21px;fill:#bbbbbb;text-anchor:middle}
+.l{font-size:18px;text-anchor:middle}
+.g{fill:#83c167}.r{fill:#fc6255}.mut{fill:#8b8b8b}
+.bars rect{fill:#58c4dd;fill-opacity:.35;height:10px;rx:2px}
+</style>
+<rect width="1000" height="470" rx="18" fill="#111111"/>
+<text x="40" y="56" class="t">Jitter: start-up loads everyone at the same moment</text>
+<line x1="500" y1="92" x2="500" y2="440" stroke="#2b2b2b" stroke-width="2"/>
+<text x="250" y="104" class="h">without jitter</text>
+<text x="750" y="104" class="h">with JitterMaxDuration</text>
+
+<g>
+<line x1="60" y1="116" x2="60" y2="290" stroke="#8b8b8b" stroke-width="1.5" stroke-dasharray="4 5"/>
+<g class="bars">
+<rect x="60" y="122" width="300"/><rect x="60" y="139" width="300"/><rect x="60" y="156" width="300"/><rect x="60" y="173" width="300"/><rect x="60" y="190" width="300"/>
+<rect x="60" y="207" width="300"/><rect x="60" y="224" width="300"/><rect x="60" y="241" width="300"/><rect x="60" y="258" width="300"/><rect x="60" y="275" width="300"/>
+</g>
+<g fill="#fc6255">
+<circle cx="360" cy="402" r="6"/><circle cx="360" cy="390" r="6"/><circle cx="360" cy="378" r="6"/><circle cx="360" cy="366" r="6"/><circle cx="360" cy="354" r="6"/>
+<circle cx="360" cy="342" r="6"/><circle cx="360" cy="330" r="6"/><circle cx="360" cy="318" r="6"/><circle cx="360" cy="306" r="6"/><circle cx="360" cy="294" r="6"/>
+</g>
+<line x1="40" y1="412" x2="470" y2="412" stroke="#666666" stroke-width="2"/>
+<text x="60" y="436" class="l mut">start-up</text>
+<text x="360" y="436" class="l r">all expire at once</text>
+</g>
+
+<g transform="translate(500 0)">
+<line x1="60" y1="116" x2="60" y2="290" stroke="#8b8b8b" stroke-width="1.5" stroke-dasharray="4 5"/>
+<g class="bars">
+<rect x="60" y="122" width="300"/><rect x="60" y="139" width="356"/><rect x="60" y="156" width="328"/><rect x="60" y="173" width="398"/><rect x="60" y="190" width="342"/>
+<rect x="60" y="207" width="370"/><rect x="60" y="224" width="314"/><rect x="60" y="241" width="384"/><rect x="60" y="258" width="356"/><rect x="60" y="275" width="328"/>
+</g>
+<g fill="#83c167">
+<circle cx="360" cy="402" r="6"/><circle cx="374" cy="402" r="6"/><circle cx="388" cy="402" r="6"/><circle cx="388" cy="389" r="6"/><circle cx="402" cy="402" r="6"/>
+<circle cx="416" cy="402" r="6"/><circle cx="416" cy="389" r="6"/><circle cx="430" cy="402" r="6"/><circle cx="444" cy="402" r="6"/><circle cx="458" cy="402" r="6"/>
+</g>
+<line x1="40" y1="412" x2="470" y2="412" stroke="#666666" stroke-width="2"/>
+<text x="60" y="436" class="l mut">start-up</text>
+<text x="400" y="436" class="l g">spread out</text>
+</g>
+</svg>

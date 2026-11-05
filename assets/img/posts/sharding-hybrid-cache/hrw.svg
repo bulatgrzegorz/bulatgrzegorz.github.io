@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 670" role="img" aria-labelledby="title desc">
+<title id="title">Rendezvous hashing: every shard scores the user, the highest score wins</title>
+<desc id="desc">Each shard scores each user with Hash of user id and shard number, shortened here to 0 to 99, and the shards are listed from the highest score down. Before, with 2 shards: user A scores shard 1 71 and shard 0 34, so shard 1 owns A. User B: shard 1 88, shard 0 22, owner shard 1. User C: shard 0 76, shard 1 41, owner shard 0. After shard 2 joins, every existing score stays the same and each list gets one more entry. A scores shard 2 92, the new highest, so A moves to shard 2. B scores shard 2 47 and C 15, so B and C keep their owners.</desc>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.h{font-size:24px;font-weight:400}
+.col{font-size:20px;font-weight:400;text-anchor:middle}
+.lbl{font-size:20px;font-weight:400}
+.sh{font-size:17px;font-weight:400}
+.sub{font-size:15px;fill:#8b8b8b}
+.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;fill:#8b8b8b}
+.note{font-size:15px;fill:#8b8b8b;text-anchor:middle}
+.foot{font-size:17px;font-weight:400;text-anchor:middle}
+.win{fill-opacity:.85}
+.lose{fill-opacity:.3}
+.own{font-size:17px;fill:#83c167}
+.moved{font-size:17px;fill:#f0ac5f}
+.rule{stroke:#2b2b2b;stroke-width:1.5}
+</style>
+<rect width="1100" height="670" rx="20" fill="#111111"/>
+
+<text x="40" y="62" class="h">Rendezvous hashing: every shard scores the user, the highest score wins</text>
+<rect x="40" y="86" width="28" height="14" rx="3" fill="#8b8b8b" class="win"/><text x="76" y="98" class="sub">highest score</text>
+<rect x="186" y="86" width="28" height="14" rx="3" fill="#8b8b8b" class="lose"/><text x="222" y="98" class="sub">lower scores</text>
+<text x="330" y="98" class="sub"><tspan class="num">Hash($"{userId}/{shard}")</tspan>, shortened to 0–99</text>
+
+<text x="365" y="148" class="col">Before: 2 shards</text>
+<text x="840" y="148" class="col">After: shard 2 joins</text>
+<path d="M590 128V588" class="rule"/>
+<path d="M40 310H1060M40 450H1060" class="rule"/>
+
+<!-- user A -->
+<text x="40" y="230" class="lbl">user A</text>
+<text x="180" y="207" class="sh" style="fill:#f7d96f">shard 1</text><rect x="260" y="190" width="142" height="22" rx="4" fill="#f7d96f" class="win"/><text x="412" y="207" class="num">71</text><text x="490" y="207" class="own">✓ owner</text>
+<text x="180" y="239" class="sh" style="fill:#58c4dd">shard 0</text><rect x="260" y="222" width="68" height="22" rx="4" fill="#58c4dd" class="lose"/><text x="338" y="239" class="num">34</text>
+<text x="640" y="207" class="sh" style="fill:#d147bd">shard 2</text><rect x="720" y="190" width="184" height="22" rx="4" fill="#d147bd" class="win"/><text x="914" y="207" class="num">92</text><text x="950" y="207" class="moved">✓ new owner</text>
+<text x="640" y="239" class="sh" style="fill:#f7d96f">shard 1</text><rect x="720" y="222" width="142" height="22" rx="4" fill="#f7d96f" class="lose"/><text x="872" y="239" class="num">71</text>
+<text x="640" y="271" class="sh" style="fill:#58c4dd">shard 0</text><rect x="720" y="254" width="68" height="22" rx="4" fill="#58c4dd" class="lose"/><text x="798" y="271" class="num">34</text>
+
+<!-- user B -->
+<text x="40" y="370" class="lbl">user B</text>
+<text x="180" y="347" class="sh" style="fill:#f7d96f">shard 1</text><rect x="260" y="330" width="176" height="22" rx="4" fill="#f7d96f" class="win"/><text x="446" y="347" class="num">88</text><text x="490" y="347" class="own">✓ owner</text>
+<text x="180" y="379" class="sh" style="fill:#58c4dd">shard 0</text><rect x="260" y="362" width="44" height="22" rx="4" fill="#58c4dd" class="lose"/><text x="314" y="379" class="num">22</text>
+<text x="640" y="347" class="sh" style="fill:#f7d96f">shard 1</text><rect x="720" y="330" width="176" height="22" rx="4" fill="#f7d96f" class="win"/><text x="906" y="347" class="num">88</text><text x="950" y="347" class="own">✓ owner</text>
+<text x="640" y="379" class="sh" style="fill:#d147bd">shard 2</text><rect x="720" y="362" width="94" height="22" rx="4" fill="#d147bd" class="lose"/><text x="824" y="379" class="num">47</text>
+<text x="640" y="411" class="sh" style="fill:#58c4dd">shard 0</text><rect x="720" y="394" width="44" height="22" rx="4" fill="#58c4dd" class="lose"/><text x="774" y="411" class="num">22</text>
+
+<!-- user C -->
+<text x="40" y="510" class="lbl">user C</text>
+<text x="180" y="487" class="sh" style="fill:#58c4dd">shard 0</text><rect x="260" y="470" width="152" height="22" rx="4" fill="#58c4dd" class="win"/><text x="422" y="487" class="num">76</text><text x="490" y="487" class="own">✓ owner</text>
+<text x="180" y="519" class="sh" style="fill:#f7d96f">shard 1</text><rect x="260" y="502" width="82" height="22" rx="4" fill="#f7d96f" class="lose"/><text x="352" y="519" class="num">41</text>
+<text x="640" y="487" class="sh" style="fill:#58c4dd">shard 0</text><rect x="720" y="470" width="152" height="22" rx="4" fill="#58c4dd" class="win"/><text x="882" y="487" class="num">76</text><text x="950" y="487" class="own">✓ owner</text>
+<text x="640" y="519" class="sh" style="fill:#f7d96f">shard 1</text><rect x="720" y="502" width="82" height="22" rx="4" fill="#f7d96f" class="lose"/><text x="812" y="519" class="num">41</text>
+<text x="640" y="551" class="sh" style="fill:#d147bd">shard 2</text><rect x="720" y="534" width="30" height="22" rx="4" fill="#d147bd" class="lose"/><text x="760" y="551" class="num">15</text>
+
+<text x="315" y="616" class="foot">a score depends on the user and the shard only</text>
+<text x="315" y="640" class="note">never on how many shards there are</text>
+<text x="840" y="616" class="foot">old scores stay, each list gets one more</text>
+<text x="840" y="640" class="note">only A ranks shard 2 first, so only A moves</text>
+</svg>

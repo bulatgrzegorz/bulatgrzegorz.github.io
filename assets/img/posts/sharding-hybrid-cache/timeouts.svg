@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-labelledby="title desc">
+<title id="title">Factory timeouts</title>
+<desc id="desc">A refresh query to MongoDB takes one second. Without a timeout, the request waits the full second. With a soft timeout of 100 milliseconds and fail-safe, the request gets the old value v1 after 100 milliseconds, while the query keeps running in the background and updates the cache to v2 when it finishes.</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#58c4dd"/></marker>
+<marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="#83c167"/></marker>
+</defs>
+<style>
+text{font-family:'CMU Serif','Latin Modern Roman',Charter,Georgia,'Times New Roman',serif;fill:#ececec}
+.t{font-size:24px}
+path,line{stroke-opacity:.65}circle{fill-opacity:.8}.g,.r,.y,.br{fill-opacity:.85}
+.lane{font-size:20px;fill:#bbbbbb}
+.l{font-size:18px}
+.g{fill:#83c167}.y{fill:#f7d96f}.br{fill:#699c52}.mut{fill:#8b8b8b}
+.q{fill:#699c52;fill-opacity:.14;stroke-opacity:.55;stroke:#699c52;stroke-width:2}
+.bg{fill:#699c52;fill-opacity:.06;stroke-opacity:.5;stroke:#699c52;stroke-width:2;stroke-dasharray:8 6}
+</style>
+<rect width="1000" height="420" rx="18" fill="#111111"/>
+<text x="40" y="56" class="t">Factory timeouts: the MongoDB query takes 1 s</text>
+
+<text x="40" y="176" class="lane">without</text>
+<text x="40" y="296" class="lane">soft timeout</text>
+
+<path d="M230 126V156" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<text x="242" y="134" class="l mut">request</text>
+<rect x="230" y="160" width="600" height="18" rx="4" class="q"/>
+<text x="530" y="152" class="l br" text-anchor="middle">MongoDB query</text>
+<path d="M830 160V130" stroke="#83c167" stroke-width="2.5" fill="none" marker-end="url(#green)"/>
+<text x="830" y="210" class="l g" text-anchor="middle">answers v2 after 1 s</text>
+
+<path d="M230 246V276" stroke="#58c4dd" stroke-width="2.5" fill="none" marker-end="url(#blue)"/>
+<rect x="230" y="280" width="60" height="18" rx="4" class="q"/>
+<rect x="290" y="280" width="540" height="18" rx="4" class="bg"/>
+<text x="560" y="272" class="l br" text-anchor="middle">keeps running in the background</text>
+<line x1="290" y1="240" x2="290" y2="340" stroke="#f7d96f" stroke-width="2.5"/>
+<text x="300" y="250" class="l y">soft timeout</text>
+<circle cx="290" cy="289" r="7" fill="#83c167"/>
+<text x="300" y="330" class="l g">answers v1 after 100 ms</text>
+<path d="M822 281l6 7l12-14" stroke="#83c167" stroke-width="3" fill="none" transform="translate(0 2)"/>
+<text x="830" y="330" class="l g" text-anchor="middle">cache updated to v2</text>
+
+<line x1="230" y1="370" x2="950" y2="370" stroke="#666666" stroke-width="2"/>
+<g stroke="#666666" stroke-width="2"><line x1="230" y1="364" x2="230" y2="376"/><line x1="290" y1="364" x2="290" y2="376"/><line x1="830" y1="364" x2="830" y2="376"/></g>
+<text x="230" y="398" class="l mut" text-anchor="middle">0</text>
+<text x="296" y="398" class="l mut" text-anchor="start">100 ms</text>
+<text x="830" y="398" class="l mut" text-anchor="middle">1 s</text>
+</svg>
