@@ -246,6 +246,18 @@ export const jobs: Job[] = [
 
 export const projects: Project[] = [
   {
+    name: "Search Algorithms",
+    headline: "Seven ways to find a string, benchmarked and illustrated.",
+    tags: ["C#", ".NET", "Benchmarks"],
+    details:
+      "Linear scans, RocksDB, Lucene and sorted arrays answer starts-with, ends-with and contains over 100,000 real ISINs while the data keeps changing. A step-by-step walkthrough shows how each one works, and the charts show what it costs.",
+    repo: "https://github.com/bulatgrzegorz/search-algorithms",
+    live: {
+      label: "Open walkthrough",
+      url: "https://bulatgrzegorz.github.io/search-algorithms/",
+    },
+  },
+  {
     name: "Sharp Dependency",
     headline: "Automated dependency updates for .NET projects.",
     tags: ["C#", ".NET", "CLI"],
